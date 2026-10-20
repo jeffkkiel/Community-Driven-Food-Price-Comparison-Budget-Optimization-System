@@ -6,8 +6,139 @@
     <title>Food Price Optimizer</title>
     <link
       rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
       href="{{ url_for('static', filename='css/style.css') }}"
     />
   </head>
-  <body></body>
+  <body>
+    <!-- Navigation Bar -->
+    <header class="navbar">
+      <a href="#" class="logo">
+        <span class="logo-mark">LG Here</span>
+        <span class="brand-text">
+          <p class="brand-name">Food Price Optimizer</p>
+          <p class="brand-description">LeBron is the GOAT</p>
+        </span>
+      </a>
+
+      <form action="search-bar" action="#">
+        <input
+          type="search"
+          name="q"
+          placeholder="Search food prices here..."
+        />
+        <button type="submit">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </form>
+    </header>
+
+    <main class="layout">
+      <!-- Left Section -->
+
+      <div class="main">
+        <!-- Hero Section -->
+        <section class="hero">
+          <h1>Welcome to the Food Price Optimizer Dashboard</h1>
+          <p class="hero-description">
+            This is a simple dashboard where you can view and analyze food
+            prices to optimize your budget.
+          </p>
+          <p class="hero-date">MM/DD/YEAR</p>
+        </section>
+
+        <!-- The Big 2 Cards -->
+        <section class="big-cards">
+          <a href="popup-add" class="card card-big">
+            <h2>Add Price</h2>
+            <p>Share prices.....</p>
+          </a>
+          <a href="popup-optimize" class="card card-big card-main">
+            <h2>Optimize Budget</h2>
+            <p>Get personalized budget recommendations.....</p>
+          </a>
+        </section>
+
+        <!-- The Small 3 Cards -->
+        <section class="small-cards">
+          <a href="popup-my-contributions" class="card card-small">
+            <h2>My Contributions</h2>
+            <p>
+              Dito ung MY Contributions, naisip ko lng idagdag to para makita
+              ano na sinumbit
+            </p>
+          </a>
+          <a href="popup-history" class="card card-small">
+            <h2>History</h2>
+            <p>Price history lahatan nalang tas may option na by category</p>
+          </a>
+          <a href="popup-day-summary" class="card card-small">
+            <h2>Day Summary</h2>
+            <p>
+              Ito mamimili sila ng araw tas makikita nila ung price doon,
+              maganda sana kung may avg contributions etc, avg price ganun idk
+            </p>
+          </a>
+        </section>
+
+        <!-- Comparing Section -->
+        <section class="compare" id="compare">
+          <h2>Compare Prices</h2>
+          <p>Ito nlng ung sa baba instead na daily summary</p>
+
+          <form action="compare-form" action="#">
+            <input type="text" name="item1" placeholder="Enter first item" />
+            <input type="text" name="item2" placeholder="Enter second item" />
+          </form>
+        </section>
+      </div>
+
+      <!-- Right Column for Statistics -->
+      <aside class="side-column">
+        <div class="panel">
+          <h3>Community</h3>
+          <div class="statistics">
+            <div><strong>12</strong><span>Stores</span></div>
+            <div><strong>24</strong><span>Foods</span></div>
+            <div><strong>36</strong><span>Users</span></div>
+            <div><strong>48</strong><span>Prices</span></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Recent activity</h3>
+          <ul class="feed">
+            <li>
+              <b>Carla</b> added banana at Public Market <time>1 hr ago</time>
+            </li>
+          </ul>
+        </div>
+      </aside>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <h3>About us</h3>
+        <p>...</p>
+
+        <div class="social-links">
+          <a href="https://facebook.com/NBA" target="_blank" rel="noopener">
+            <i class="fa-brands fa-facebook-f"></i>
+          </a>
+          <a href="https://github.com/NBA" target="_blank" rel="noopener">
+            <i class="fa-brands fa-github"></i>
+          </a>
+        </div>
+
+        <p class="credits">
+          Developed by Jeff Ezekiel Belnas | Quintela, Justin Matthew |
+          Trinidad, Ian Kyle
+        </p>
+      </div>
+    </footer>
+  </body>
 </html>
