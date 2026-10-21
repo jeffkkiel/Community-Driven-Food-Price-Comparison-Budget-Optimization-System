@@ -16,21 +16,25 @@
   <body>
     <!-- Navigation Bar -->
     <header class="navbar">
-      <a href="#" class="logo">
-        <span class="logo-mark">LG Here</span>
-        <span class="brand-text">
+      <a href="/" class="logo">
+        <img
+          src="{{ url_for('static', filename='images/LOGO.png') }}"
+          alt="Food Price Optimizer logo"
+          class="logo-mark"
+        />
+        <div class="brand-text">
           <p class="brand-name">Food Price Optimizer</p>
-          <p class="brand-description">LeBron is the GOAT</p>
-        </span>
+          <p class="brand-description">Look for GOAT here</p>
+        </div>
       </a>
 
-      <form action="search-bar" action="#">
+      <form class="search-bar" action="#">
         <input
           type="search"
           name="q"
           placeholder="Search food prices here..."
         />
-        <button type="submit">
+        <button type="submit" aria-label="Search">
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
       </form>
