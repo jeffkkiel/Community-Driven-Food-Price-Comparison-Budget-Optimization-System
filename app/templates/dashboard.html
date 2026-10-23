@@ -57,10 +57,12 @@
         <!-- The Big 2 Cards -->
         <section class="big-cards">
           <a href="#popup-add" class="card card-big">
+            <i class="fa-solid fa-plus"></i>
             <h2>Add Price</h2>
             <p>Saw a price at your store? Share it with the community.</p>
           </a>
           <a href="#popup-optimize" class="card card-big card-main">
+            <i class="fa-solid fa-arrow-trend-up"></i>
             <h2>Optimize Budget</h2>
             <p>Enter your budget and basket. We find the cheapest store.</p>
           </a>
@@ -69,14 +71,18 @@
         <!-- The Small 3 Cards -->
         <section class="small-cards">
           <a href="#popup-my-contributions" class="card card-small">
+            <i class="fa-solid fa-user"></i>
             <h2>My Contributions</h2>
             <p>See the prices you submitted.</p>
           </a>
           <a href="#popup-history" class="card card-small">
+            <i class="fa-solid fa-clock-rotate-left"></i>
             <h2>History</h2>
             <p>Price history by product or category.</p>
           </a>
+
           <a href="#popup-day-summary" class="card card-small">
+            <i class="fa-solid fa-calendar-day"></i>
             <h2>Day Summary</h2>
             <p>Pick a date and see that day's prices.</p>
           </a>
@@ -100,20 +106,22 @@
           <h3>Community</h3>
           <div class="statistics">
             <!-- Dito kailangan din jinja. Stats to parang nagu-update -->
-            <div><strong>{{ }}</strong><span>Stores</span></div>
-            <div><strong>{{ }}</strong><span>Foods</span></div>
-            <div><strong>{{ }}</strong><span>Users</span></div>
-            <div><strong>{{ }}</strong><span>Prices</span></div>
+            {% set stats = stats | default({}) %}
+            <div><strong>{{ stats.stores }}</strong><span>Stores</span></div>
+            <div><strong>{{ stats.foods }}</strong><span>Foods</span></div>
+            <div><strong>{{ stats.users }}</strong><span>Users</span></div>
+            <div><strong>{{ stats.prices }}</strong><span>Prices</span></div>
           </div>
         </div>
 
         <div class="panel">
           <h3>Recent activity</h3>
           <ul class="feed">
-            { % for ... in ... % }
+            {% for item in activity | default([]) %}
             <li>
-              <b>{{ username }}</b> added {{ food }} at {{ location }}
-              <time>{{ time }}</time>
+              <b>{{ item.username }}</b> added {{ item.food }} at {{
+              item.location }}
+              <time>{{ item.time }}</time>
             </li>
             {% else %}
             <li>No activity yet.</li>
@@ -124,9 +132,12 @@
     </main>
 
     <!-- Popups, di na kailngan nung base pre kasi imbes na pupunta sa ibang page pag pinindot ung card, magiging popup na lang -->
-    {% include "popups/add_price.html" %} {% include "popups/optimize.html" %}
-    {% include "popups/contributions.html" %} {% include "popups/history.html"
-    %} {% include "popups/day_summary.html" %}
+    <!-- prettier-ignore -->
+    {% include "popups/add_price.html" %} 
+    {% include "popups/optimize.html" %}
+    {% include "popups/contributions.html" %} 
+    {% include "popups/history.html"%} 
+    {% include "popups/day_summary.html" %}
 
     <!-- Footer -->
     <footer class="footer">
