@@ -56,35 +56,29 @@
 
         <!-- The Big 2 Cards -->
         <section class="big-cards">
-          <a href="popup-add" class="card card-big">
+          <a href="#popup-add" class="card card-big">
             <h2>Add Price</h2>
-            <p>Share prices.....</p>
+            <p>Saw a price at your store? Share it with the community.</p>
           </a>
-          <a href="popup-optimize" class="card card-big card-main">
+          <a href="#popup-optimize" class="card card-big card-main">
             <h2>Optimize Budget</h2>
-            <p>Get personalized budget recommendations.....</p>
+            <p>Enter your budget and basket. We find the cheapest store.</p>
           </a>
         </section>
 
         <!-- The Small 3 Cards -->
         <section class="small-cards">
-          <a href="popup-my-contributions" class="card card-small">
+          <a href="#popup-my-contributions" class="card card-small">
             <h2>My Contributions</h2>
-            <p>
-              Dito ung MY Contributions, naisip ko lng idagdag to para makita
-              ano na sinumbit
-            </p>
+            <p>See the prices you submitted.</p>
           </a>
-          <a href="popup-history" class="card card-small">
+          <a href="#popup-history" class="card card-small">
             <h2>History</h2>
-            <p>Price history lahatan nalang tas may option na by category</p>
+            <p>Price history by product or category.</p>
           </a>
-          <a href="popup-day-summary" class="card card-small">
+          <a href="#popup-day-summary" class="card card-small">
             <h2>Day Summary</h2>
-            <p>
-              Ito mamimili sila ng araw tas makikita nila ung price doon,
-              maganda sana kung may avg contributions etc, avg price ganun idk
-            </p>
+            <p>Pick a date and see that day's prices.</p>
           </a>
         </section>
 
@@ -93,7 +87,7 @@
           <h2>Compare Prices</h2>
           <p>Ito nlng ung sa baba instead na daily summary</p>
 
-          <form action="compare-form" action="#">
+          <form action="#">
             <input type="text" name="item1" placeholder="Enter first item" />
             <input type="text" name="item2" placeholder="Enter second item" />
           </form>
@@ -102,27 +96,38 @@
 
       <!-- Right Column for Statistics -->
       <aside class="side-column">
-        <div class="panel">
+        <div class="panel panel-dark">
           <h3>Community</h3>
           <div class="statistics">
-            <div><strong>12</strong><span>Stores</span></div>
-            <div><strong>24</strong><span>Foods</span></div>
-            <div><strong>36</strong><span>Users</span></div>
-            <div><strong>48</strong><span>Prices</span></div>
+            <!-- Dito kailangan din jinja. Stats to parang nagu-update -->
+            <div><strong>{{ }}</strong><span>Stores</span></div>
+            <div><strong>{{ }}</strong><span>Foods</span></div>
+            <div><strong>{{ }}</strong><span>Users</span></div>
+            <div><strong>{{ }}</strong><span>Prices</span></div>
           </div>
         </div>
 
         <div class="panel">
           <h3>Recent activity</h3>
           <ul class="feed">
+            { % for item in activity % }
             <li>
-              <b>Carla</b> added banana at Public Market <time>1 hr ago</time>
+              <b>{{Carla}}</b> added {{banana}} at {{SM Supermarkte}}
+              <time>{{1 hr ago}}</time>
             </li>
+            {% else %}
+            <li>No activity yet.</li>
+            {% endfor %}
           </ul>
         </div>
       </aside>
     </main>
-    {% block content %}{% endblock %}
+
+    <!-- Popups, di na kailngan nung base pre kasi imbes na pupunta sa ibang page pag pinindot ung card, magiging popup na lang -->
+    {% include "popups/add_price.html" %} {% include "popups/optimize.html" %}
+    {% include "popups/contributions.html" %} {% include "popups/history.html"
+    %} {% include "popups/day_summary.html" %}
+
     <!-- Footer -->
     <footer class="footer">
       <div class="container">
