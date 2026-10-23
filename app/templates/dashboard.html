@@ -110,10 +110,10 @@
         <div class="panel">
           <h3>Recent activity</h3>
           <ul class="feed">
-            { % for item in activity % }
+            { % for ... in ... % }
             <li>
-              <b>{{Carla}}</b> added {{banana}} at {{SM Supermarkte}}
-              <time>{{1 hr ago}}</time>
+              <b>{{ username }}</b> added {{ food }} at {{ location }}
+              <time>{{ time }}</time>
             </li>
             {% else %}
             <li>No activity yet.</li>
