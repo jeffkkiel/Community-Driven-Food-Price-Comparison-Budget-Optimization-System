@@ -1,0 +1,10 @@
+# This file lists the Python packages required for this project.
+# Make sure your virtual environment (.venv) is activated first.
+# Install all requirements by running:
+# python -m pip install -r requirements.txt
+
+flask
+python-dotenv
+flask-wtf
+flask-sqlalchemy
+flask-migrate
