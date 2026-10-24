@@ -33,9 +33,9 @@ content %}
         <label for="city">City</label>
         <select id="city" name="city" required>
           <option value="">Choose a city</option>
-          <option value="bacoor">Bacoor</option>
-          <option value="dasmarinas">Dasmariñas</option>
-          <option value="imus">Imus</option>
+          {% for value, label in cities %}
+          <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
         </select>
       </div>
     </fieldset>
@@ -47,11 +47,9 @@ content %}
         <label for="store">Store</label>
         <select id="store" name="store" required>
           <option value="">Choose a store</option>
-          <option value="sm-supermarket">SM Supermarket</option>
-          <option value="robinsons">Robinsons</option>
-          <option value="puregold">Puregold</option>
-          <option value="savemore">Savemore</option>
-          <option value="palengke">Palengke</option>
+          {% for value, label in stores %}
+          <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
           <option value="other">Other</option>
         </select>
       </div>
@@ -86,18 +84,11 @@ content %}
       <legend>Step 5: Food category</legend>
       <div class="field">
         <label for="category">Category</label>
-        <select id="category" name="category" required>
-          <option value="">Choose a category</option>
-          <option value="rice-grains">Rice &amp; Grains</option>
-          <option value="fruits">Fruits</option>
-          <option value="vegetables">Vegetables</option>
-          <option value="meat-poultry">Meat &amp; Poultry</option>
-          <option value="fish-seafood">Fish &amp; Seafood</option>
-          <option value="dairy-eggs">Dairy &amp; Eggs</option>
-          <option value="cooking-essentials">Cooking Essentials</option>
-          <option value="beverages">Beverages</option>
-          <option value="other">Other</option>
-        </select>
+        <select id="category" name="category" required></select>
+        <option value="">Choose a category</option>
+        {% for value, label in categories %}
+        <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
       </div>
       <div class="field">
         <label for="category_other">If other, type the category</label>

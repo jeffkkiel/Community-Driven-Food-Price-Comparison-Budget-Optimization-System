@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, request
 from app import app
 from app.forms import *
 
@@ -21,6 +21,9 @@ def dashboard():
 
 @app.route("/add", methods=["GET", "POST"])
 def add_price():
+    if request.method == "POST":
+        flash("Price Submitted.")
+        return redirect(url_for("dashboard"))
     return render_template("add_price.html", form=ProductForm())
 
 
