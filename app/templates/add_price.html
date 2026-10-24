@@ -84,11 +84,13 @@ content %}
       <legend>Step 5: Food category</legend>
       <div class="field">
         <label for="category">Category</label>
-        <select id="category" name="category" required></select>
-        <option value="">Choose a category</option>
-        {% for value, label in categories %}
-        <option value="{{ value }}">{{ label }}</option>
-        {% endfor %}
+        <select id="category" name="category" required>
+          <option value="">Choose a category</option>
+          {% for value, label in categories %}
+          <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+          <option value="other">Other</option>
+        </select>
       </div>
       <div class="field">
         <label for="category_other">If other, type the category</label>

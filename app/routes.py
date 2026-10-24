@@ -1,5 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
 from app import app
+from app.services.catalog import get_add_price_options
 from app.forms import *
 
 
@@ -24,7 +25,7 @@ def add_price():
     if request.method == "POST":
         flash("Price Submitted.")
         return redirect(url_for("dashboard"))
-    return render_template("add_price.html", form=ProductForm())
+    return render_template("add_price.html", **get_add_price_options())
 
 
 @app.route("/optimize")
