@@ -42,7 +42,7 @@ def add_product():
         if form.category.data not in CATEGORIES:
             flash("Please choose a valid category.")
             return render_template("add_product.html", form=form)
-        if form.address.data not in LOCATIONS:
+        if form.location.data not in LOCATIONS:
             flash("Please choose a valid location.")
             return render_template("add_product.html", form=form)
 
@@ -58,10 +58,10 @@ def add_product():
             store = db.session.scalar(
                 db.select(Store).where(
                     func.lower(Store.name) == store_name.lower(),
-                    Store.location == form.address.data,))
+                    Store.location == form.location.data,))
 
             if store is None:
-                store = Store(name=store_name, location=form.address.data,)
+                store = Store(name=store_name, location=form.location.data,)
                 db.session.add(store)
                 db.session.flush()
 
@@ -79,7 +79,7 @@ def add_product():
                 flash("The selected store does not exist.")
                 return render_template("add_product.html", form=form)
 
-            if store.location != form.address.data:
+            if store.location != form.location.data:
                 flash("The selected store and location do not match.")
                 return render_template("add_product.html", form=form)
         try:
@@ -145,6 +145,8 @@ def add_product():
         flash("Product and price saved successfully.")
         return redirect(url_for("dashboard"))
 
+    if form.is_submitted():
+        print(form.errors)
     return render_template("add_product.html", form=form)
     
 
