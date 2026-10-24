@@ -1,6 +1,6 @@
 # Community-Driven Food Price Comparison & Budget Optimization System
 
-**Group Name:** Six Seveners  
+**Group Name:** Philippine Six Seveners  
 **Course:** S-CSPC212 — Discrete Structures  
 **Section:** BCS22  
 **Programming Language:** Python  
