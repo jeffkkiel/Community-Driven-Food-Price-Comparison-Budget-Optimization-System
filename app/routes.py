@@ -6,6 +6,8 @@ from flask import render_template, flash, redirect, url_for
 from werkzeug.utils import secure_filename
 import sqlalchemy as sa
 
+from sqlalchemy import func
+from sqlalchemy.exc import SQLAlchemyError
 from app import app, db
 from app.forms import *
 from app.models import *
@@ -31,7 +33,7 @@ def dashboard():
 def add_product():
     form = ProductForm()
 
-    # Populate dynamic dropdown choices here.
+    # para sa dropdown(chat for explanation)
     stores = db.session.scalars(db.select(Store).order_by(Store.name, Store.location)).all()
     form.store.choices = [("", "Choose a store"), *[(str(store.id), f"{store.name} — {store.location}") for store in stores],
             ("__new__", "Add a new store..."),]
@@ -64,7 +66,7 @@ def add_product():
                 db.session.flush()
 
         else:
-            # Verify the selected store actually exists.
+            #chcik if the selected store actually exists.
             try:
                 store_id = int(form.store.data)
             except (ValueError, TypeError):
@@ -83,7 +85,7 @@ def add_product():
         try:
             product_name = form.product.data.strip()
 
-            # Reuse an existing product with the same name.
+            #reuse existing product with the same name.
             product = db.session.scalar(db.select(Product).where(func.lower(Product.name) == product_name.lower()))
 
             if product is None:
@@ -95,7 +97,7 @@ def add_product():
                 db.session.add(product)
                 db.session.flush()
 
-            # Save an optional uploaded image.
+            #save optional uploaded image. idk pwede tanggalin kung medyo idk
             image = form.img.data
             if image and image.filename:
                 safe_name = secure_filename(image.filename)
@@ -110,11 +112,12 @@ def add_product():
                 image.save(os.path.join(upload_dir, filename))
                 product.img_ref = f"uploads/{filename}"
 
-            # Find an existing listing for this product and store.
+            #check if product already exists for price history
             listing = db.session.scalar(
                 db.select(ProductStore).where(ProductStore.product_id == product.id, ProductStore.store_id == store.id,))
-
-            price = form.price.data
+            quantity = form.quantity.data
+            total_price = form.total_price.data
+            price = total_price / quantity
 
             if listing is None:
                 listing = ProductStore(
@@ -127,7 +130,7 @@ def add_product():
             else:
                 listing.price = price
 
-            # Record every submitted price as a historical observation.
+            #record price
             history = PriceHistory(product_store=listing,price=price,)
             db.session.add(history)
 

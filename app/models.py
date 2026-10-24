@@ -27,15 +27,16 @@ class Product(db.Model):
 #debug: let store name be unique to only one location
 class Store(db.Model):
     __tablename__ = "stores"
+    __table_args__ = (sa.UniqueConstraint("name", "location", name="uq_store_name_location"),)
+
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-    name: so.Mapped[str] = so.mapped_column(
-        sa.String(150), unique=True, index=True, nullable=False)
-    location: so.Mapped[str | None] = so.mapped_column(sa.String(255))
+    name: so.Mapped[str] = so.mapped_column(sa.String(150), index=True, nullable=False)
+    location: so.Mapped[str | None] = so.mapped_column(sa.String(255), nullable=False)
 
     product_listings: so.Mapped[list["ProductStore"]] = so.relationship(back_populates="store")
 
     def __repr__(self):
-        return f"<Store {self.name}>"
+        return f"<Store {self.name} - {self.location}>"
 
 # Connects a product to a store and stores its current price.
 class ProductStore(db.Model):
@@ -74,8 +75,7 @@ class PriceHistory(db.Model):
         nullable=False
     )
 
-    product_store: so.Mapped["ProductStore"] = so.relationship(
-        back_populates="price_history")
+    product_store: so.Mapped["ProductStore"] = so.relationship(back_populates="price_history")
 
     def __repr__(self):
         return f"<PriceHistory {self.price} - {self.recorded_at}>"

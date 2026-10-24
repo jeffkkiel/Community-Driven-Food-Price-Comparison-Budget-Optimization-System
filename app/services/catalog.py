@@ -1,4 +1,5 @@
 # for add_product values and more?
+#depreciated(no longer in use)
 from decimal import Decimal
 from app import app
 

@@ -1,5 +1,4 @@
-{% extends "base.html" %} {% block title %}Add Price{% endblock %} {% block
-content %}
+{% extends "base.html" %} {% block title %}Add Price{% endblock %} {% block content %}
 
 <main class="page">
   <!-- Back link -->
@@ -7,174 +6,109 @@ content %}
     <i class="fa-solid fa-arrow-left"></i> Back to dashboard
   </a>
 
-  <h1>Add Price</h1>
+  <form action="{{ url_for('add_product') }}" method="POST" ecntype="multipart/form-data">
+    {{ form.hidden_tag() }}
 
-  <!-- Form -->
-  <form action="{{ url_for('add_price') }}" method="post">
-    <!-- STEP 1: Input Name -->
-    <fieldset>
-      <legend>Step 1: Name</legend>
-      <div class="field">
-        <label for="name">Name</label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          placeholder="Enter your name"
-          required
-        />
-      </div>
-    </fieldset>
+    <!-- Step 1: Product Name -->
+    <!-- wala nang brand name, variant, unit. lahat nasa pangalan na lang -->
+    <div class="form-group">
+      {{ form.product.label }}
+      {{ form.product(placeholder="e.g. Jasmine Rice 1 kg") }}
 
-    <!-- step 2: city -->
-    <fieldset>
-      <legend>Step 2: City</legend>
-      <div class="field">
-        <label for="city">City</label>
-        <select id="city" name="city" required>
-          <option value="">Choose a city</option>
-          {% for value, label in cities %}
-          <option value="{{ value }}">{{ label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-    </fieldset>
+      {% for error in form.product.errors %}
+        <span class="error">{{ error }}</span>
+      {% endfor %}
+    </div>
 
-    <!-- step 3: store -->
-    <fieldset>
-      <legend>Step 3: Store</legend>
-      <div class="field">
-        <label for="store">Store</label>
-        <select id="store" name="store" required>
-          <option value="">Choose a store</option>
-          {% for store in default_stores %}
-          <option value="{{ store }}">{{ store }}</option>
-          {% endfor %}
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="store_other">If other, type the store</label>
-        <input
-          type="text"
-          id="store_other"
-          name="store_other"
-          placeholder="e.g. Emilus Store"
-        />
-      </div>
-    </fieldset>
+    <!-- Step 2: Category -->
+    <div class="form-group">
+      {{ form.category.label }}
+      {{ form.category() }}
 
-    <!-- step 4: branch -->
-    <fieldset>
-      <legend>Step 4: Branch</legend>
-      <div class="field">
-        <label for="branch">Branch name</label>
-        <input
-          type="text"
-          id="branch"
-          name="branch"
-          placeholder="e.g. SM Molino, Maryhomes Palengke"
-          required
-        />
-      </div>
-    </fieldset>
+      {% for error in form.category.errors %}
+        <span class="error">{{ error }}</span>
+      {% endfor %}
+    </div>
 
-    <!-- step 5: food category -->
-    <fieldset>
-      <legend>Step 5: Food category</legend>
-      <div class="field">
-        <label for="category">Category</label>
-        <select id="category" name="category" required>
-          <option value="">Choose a category</option>
-          {% for value, label in categories %}
-          <option value="{{ value }}">{{ label }}</option>
-          {% endfor %}
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="category_other">If other, type the category</label>
-        <input
-          type="text"
-          id="category_other"
-          name="category_other"
-          placeholder="e.g. Snacks"
-        />
-      </div>
-    </fieldset>
+    <!-- Step 3: Description -->
+    <div class="form-group">
+      {{ form.description.label }}
+      {{ form.description(placeholder="Optional product details") }}
 
-    <!-- step 6: food -->
-    <fieldset>
-      <legend>Step 6: Food</legend>
-      <div class="field">
-        <label for="food">Exact food name</label>
-        <input
-          type="text"
-          id="food"
-          name="food"
-          placeholder="e.g. Rice, Apple"
-          required
-        />
-      </div>
-      <div class="field">
-        <label for="brand">Brand / variant</label>
-        <input
-          type="text"
-          id="brand"
-          name="brand"
-          placeholder="e.g. Jasmine, Fuji (or N/A)"
-        />
-      </div>
-    </fieldset>
+      {% for error in form.description.errors %}
+          <span class="error">{{ error }}</span>
+      {% endfor %}
+    </div>
 
-    <!-- step 7: quantity -->
-    <fieldset>
-      <legend>Step 7: Quantity</legend>
-      <div class="field">
-        <label for="quantity">Quantity</label>
-        <input
-          type="number"
-          id="quantity"
-          name="quantity"
-          min="0.001"
-          step="any"
-          placeholder="e.g. 1, 0.5, 12"
-          required
-        />
-      </div>
-      <div class="field">
-        <label for="unit">Unit</label>
-        <select id="unit" name="unit" required>
-          <option value="">Choose a unit</option>
-          {% for u in units %}
-          <option value="{{ u }}">{{ u }}</option>
-          {% endfor %}
-        </select>
-      </div>
-    </fieldset>
+    <!-- Step 4: Product Image -->
+    <div class="form-group">
+        {{ form.img.label }}
+        {{ form.img(accept="image/*") }}
 
-    <!-- step 8: price and date -->
-    <fieldset>
-      <legend>Step 8: Price and Date</legend>
-      <div class="field">
-        <label for="price">Price (₱)</label>
-        <input
-          type="number"
-          id="price"
-          name="price"
-          min="0.01"
-          step="0.01"
-          placeholder="e.g. 55.00"
-          required
-        />
-      </div>
-      <div class="field">
-        <label for="date_seen">Date seen</label>
-        <input type="date" id="date_seen" name="date_seen" required />
-      </div>
-    </fieldset>
+        {% for error in form.img.errors %}
+            <span class="error">{{ error }}</span>
+        {% endfor %}
+    </div>
 
-    <button type="submit" class="btn">Submit price</button>
+    <!-- Step 5: Store -->
+    <div class="form-group">
+        {{ form.store.label }}
+        {{ form.store(id="store-select") }}
+
+        {% for error in form.store.errors %}
+            <span class="error">{{ error }}</span>
+        {% endfor %}
+    </div>
+
+    <!-- Shown only when the user chooses to add a store -->
+    <div class="form-group" id="new-store-group" hidden>
+        {{ form.store_name.label }}
+        {{ form.store_name(placeholder="e.g. SM Supermarket") }}
+
+        {% for error in form.store_name.errors %}
+            <span class="error">{{ error }}</span>
+        {% endfor %}
+    </div>
+
+    <!-- Step 6: Store Location -->
+    <div class="form-group">
+        {{ form.location.label }}
+        {{ form.location() }}
+
+        {% for error in form.location.errors %}
+            <span class="error">{{ error }}</span>
+        {% endfor %}
+    </div>
+
+    <!-- Step 7: Quantity -->
+    <div class="form-group">
+        {{ form.quantity.label }}
+        {{ form.quantity(min="1", step="1") }}
+
+        {% for error in form.quantity.errors %}
+            <span class="error">{{ error }}</span>
+        {% endfor %}
+    </div>
+
+    <!-- Step 8: Total Price -->
+    <div class="form-group">
+        {{ form.total_price.label }}
+        {{ form.total_price(min="0.01", step="0.01", placeholder="e.g. 150.00") }}
+
+        {% for error in form.total_price.errors %}
+            <span class="error">{{ error }}</span>
+        {% endfor %}
+    </div>
+
+    <!-- Calculated price preview -->
+    <p id="price-preview">Price per item/package: ₱0.00</p>
+
+    {{ form.submit(class="btn btn-primary") }}
+
+
+
+
+
   </form>
 </main>
 {% endblock %}

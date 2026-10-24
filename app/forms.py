@@ -15,11 +15,12 @@ class ProductForm(FlaskForm):
     category = SelectField('Category', choices=[(c, c) for c in CATEGORIES], validators=[DataRequired()])
     description = StringField('Add Description', validators=[Optional()])
     # gagamit ba tayo ng image?
-    img = FileField('Upload an Image')
+    img = FileField('Upload an Image', validators=[Optional()])
     location = SelectField('Address', choices=[("", "Choose a location")] + [(loc, loc) for loc in LOCATIONS], validators=[DataRequired()])
     store = SelectField('Store', choices=[("", "Choose a store"), ("__new__", "Add a new store...")], validators=[DataRequired()])
     store_name = StringField("New Store Name", validators=[Optional(), Length(max=150)])
-    price = DecimalField('Price (₱)', places = 2, validators=[DataRequired(), NumberRange(min=0)])
+    quantity = IntegerField('Product Amount', default=1, validators=[DataRequired(), NumberRange(min=1)])
+    total_price = DecimalField('Total Price (₱)', places = 2, validators=[DataRequired(), NumberRange(min=0)])
     submit = SubmitField('Add Product')
 
 
