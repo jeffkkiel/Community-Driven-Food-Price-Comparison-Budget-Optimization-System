@@ -1,178 +1,104 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Food Price Optimizer</title>
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/style.css') }}"
-    />
-  </head>
-  <body>
-    <!-- Navigation Bar -->
-    <header class="navbar">
-      <a href="/" class="logo">
-        <img
-          src="{{ url_for('static', filename='images/LOGO.png') }}"
-          alt="Food Price Optimizer logo"
-          class="logo-mark"
-        />
-        <div class="brand-text">
-          <p class="brand-name">Food Price Optimizer</p>
-          <p class="brand-description">Look for GOAT here</p>
-        </div>
+{% extends "base.html" %} {% block content %}
+<main class="layout">
+  <!-- Left Section -->
+  <div class="main">
+    <!-- Hero Section -->
+    <section class="hero">
+      <h1 id="greeting">Good Afternoon!</h1>
+      <p class="hero-description">
+        This is a simple dashboard where you can view and analyze food prices to
+        optimize your budget.
+      </p>
+      <p class="hero-date" id="hero-date">MM/DD/YEAR</p>
+    </section>
+
+    <!-- The Big 2 Cards -->
+    <section class="big-cards">
+      <a href="{{ url_for('add_price') }}" class="card card-big">
+        <i class="fa-solid fa-plus"></i>
+        <h2>Add Price</h2>
+        <p>Saw a price at your store? Share it with the community.</p>
+      </a>
+      <a href="{{ url_for('optimize') }}" class="card card-big card-main">
+        <i class="fa-solid fa-arrow-trend-up"></i>
+        <h2>Optimize Budget</h2>
+        <p>Enter your budget and basket. We find the cheapest store.</p>
+      </a>
+    </section>
+
+    <!-- The Small 3 Cards -->
+    <section class="small-cards">
+      <a href="{{ url_for('contributions') }}" class="card card-small">
+        <i class="fa-solid fa-user"></i>
+        <h2>My Contributions</h2>
+        <p>See the prices you submitted.</p>
+      </a>
+      <a href="{{ url_for('history') }}" class="card card-small">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        <h2>History</h2>
+        <p>Price history by product or category.</p>
       </a>
 
-      <form class="search-bar" action="#">
-        <input
-          type="search"
-          name="q"
-          placeholder="Search food prices here..."
-        />
-        <button type="submit" aria-label="Search">
-          <i class="fa-solid fa-magnifying-glass"></i>
-        </button>
+      <a href="{{ url_for('day_summary') }}" class="card card-small">
+        <i class="fa-solid fa-calendar-day"></i>
+        <h2>Day Summary</h2>
+        <p>Pick a date and see that day's prices.</p>
+      </a>
+    </section>
+
+    <!-- Comparing Section -->
+    <section class="compare" id="compare">
+      <h2>Compare Prices</h2>
+      <p>Type two foods to compare their prices across stores.</p>
+
+      <form
+        action="{{ url_for('dashboard') }}#compare"
+        method="post"
+        novalidate
+      >
+        {{ comprForm.hidden_tag() }}
+        <div class="field">
+          {{ comprForm.product1.label }} {{ comprForm.product1(size=32) }}
+        </div>
+        <div class="field">
+          {{ comprForm.product2.label }} {{ comprForm.product2(size=32) }}
+        </div>
+        {{ comprForm.submit(class="btn") }}
       </form>
-    </header>
 
-    <main class="layout">
-      <!-- Left Section -->
+      {% if result %}
+      <p class="result">{{ result }}</p>
+      {% endif %}
+    </section>
+  </div>
 
-      <div class="main">
-        <!-- Hero Section -->
-        <section class="hero">
-          <h1 id="greeting">Good Afternoon!</h1>
-          <p class="hero-description">
-            This is a simple dashboard where you can view and analyze food
-            prices to optimize your budget.
-          </p>
-          <p class="hero-date" id="hero-date">MM/DD/YEAR</p>
-        </section>
-
-        <!-- The Big 2 Cards -->
-        <section class="big-cards">
-          <a href="#popup-add" class="card card-big">
-            <i class="fa-solid fa-plus"></i>
-            <h2>Add Price</h2>
-            <p>Saw a price at your store? Share it with the community.</p>
-          </a>
-          <a href="#popup-optimize" class="card card-big card-main">
-            <i class="fa-solid fa-arrow-trend-up"></i>
-            <h2>Optimize Budget</h2>
-            <p>Enter your budget and basket. We find the cheapest store.</p>
-          </a>
-        </section>
-
-        <!-- The Small 3 Cards -->
-        <section class="small-cards">
-          <a href="#popup-my-contributions" class="card card-small">
-            <i class="fa-solid fa-user"></i>
-            <h2>My Contributions</h2>
-            <p>See the prices you submitted.</p>
-          </a>
-          <a href="#popup-history" class="card card-small">
-            <i class="fa-solid fa-clock-rotate-left"></i>
-            <h2>History</h2>
-            <p>Price history by product or category.</p>
-          </a>
-
-          <a href="#popup-day-summary" class="card card-small">
-            <i class="fa-solid fa-calendar-day"></i>
-            <h2>Day Summary</h2>
-            <p>Pick a date and see that day's prices.</p>
-          </a>
-        </section>
-
-        <!-- Comparing Section -->
-        <section class="compare" id="compare">
-          <h2>Compare Prices</h2>
-          <p>Ito nlng ung sa baba instead na daily summary</p>
-
-          <form action="#">
-            <input type="text" name="item1" placeholder="Enter first item" />
-            <input type="text" name="item2" placeholder="Enter second item" />
-          </form>
-          <form action="" method="post" novalidate>
-              {{ comprForm.hidden_tag() }}
-              <p>
-                  {{ comprForm.product1.label }}<br>
-                  {{ comprForm.product1(size=32) }}
-              </p>
-              <p>
-                  {{ comprForm.product2.label }}<br>
-                  {{ comprForm.product1(size=32) }}
-              </p>
-              <p>{{ comprForm.submit() }}</p>
-          </form>
-        </section>
+  <!-- Right Column for Statistics -->
+  <aside class="side-column">
+    <div class="panel panel-dark">
+      <h3>Community</h3>
+      <div class="statistics">
+        {% set stats = stats | default({}) %}
+        <div><strong>{{ stats.stores }}</strong><span>Stores</span></div>
+        <div><strong>{{ stats.foods }}</strong><span>Foods</span></div>
+        <div><strong>{{ stats.users }}</strong><span>Users</span></div>
+        <div><strong>{{ stats.prices }}</strong><span>Prices</span></div>
       </div>
+    </div>
 
-      <!-- Right Column for Statistics -->
-      <aside class="side-column">
-        <div class="panel panel-dark">
-          <h3>Community</h3>
-          <div class="statistics">
-            <!-- Dito kailangan din jinja. Stats to parang nagu-update -->
-            {% set stats = stats | default({}) %}
-            <div><strong>{{ stats.stores }}</strong><span>Stores</span></div>
-            <div><strong>{{ stats.foods }}</strong><span>Foods</span></div>
-            <div><strong>{{ stats.users }}</strong><span>Users</span></div>
-            <div><strong>{{ stats.prices }}</strong><span>Prices</span></div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <h3>Recent activity</h3>
-          <ul class="feed">
-            {% for item in activity | default([]) %}
-            <li>
-              <b>{{ item.username }}</b> added {{ item.food }} at {{
-              item.location }}
-              <time>{{ item.time }}</time>
-            </li>
-            {% else %}
-            <li>No activity yet.</li>
-            {% endfor %}
-          </ul>
-        </div>
-      </aside>
-    </main>
-
-    <!-- Popups, di na kailngan nung base pre kasi imbes na pupunta sa ibang page pag pinindot ung card, magiging popup na lang -->
-    <!-- prettier-ignore -->
-    {% include "popups/add_price.html" %} 
-    {% include "popups/optimize.html" %}
-    {% include "popups/contributions.html" %} 
-    {% include "popups/history.html"%} 
-    {% include "popups/day_summary.html" %}
-
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="container">
-        <h3>About us</h3>
-        <p>...</p>
-
-        <div class="social-links">
-          <a href="https://facebook.com/NBA" target="_blank" rel="noopener">
-            <i class="fa-brands fa-facebook-f"></i>
-          </a>
-          <a href="https://github.com/NBA" target="_blank" rel="noopener">
-            <i class="fa-brands fa-github"></i>
-          </a>
-        </div>
-
-        <p class="credits">
-          Developed by Jeff Ezekiel Belnas | Quintela, Justin Matthew |
-          Trinidad, Ian Kyle
-        </p>
-      </div>
-    </footer>
-
-    <script src="{{ url_for('static', filename='js/js.js') }}"></script>
-  </body>
-</html>
+    <div class="panel">
+      <h3>Recent activity</h3>
+      <ul class="feed">
+        {% for item in activity | default([]) %}
+        <li>
+          <b>{{ item.username }}</b> added {{ item.food }} at {{ item.location
+          }}
+          <time>{{ item.time }}</time>
+        </li>
+        {% else %}
+        <li>No activity yet.</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </aside>
+</main>
+{% endblock %}

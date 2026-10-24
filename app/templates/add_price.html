@@ -1,0 +1,143 @@
+{% extends "base.html" %} {% block title %}Add Price{% endblock %} {% block
+content %}
+
+<main class="page">
+  <!-- Back link -->
+  <a href="{{ url_for('dashboard') }}" class="back-link">
+    <i class="fa-solid fa-arrow-left"></i> Back to dashboard
+  </a>
+
+  <h1>Add Price</h1>
+
+  <!-- Form -->
+  <form action="{{ url_for('add_price') }}" method="post">
+    <!-- STEP 1: Input Name -->
+    <fieldset>
+      <legend>Step 1: Name</legend>
+      <div class="field">
+        <label for="name">Name</label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          placeholder="Enter your name"
+          required
+        />
+      </div>
+    </fieldset>
+
+    <!-- step 2: city -->
+    <fieldset>
+      <legend>Step 2: City</legend>
+      <div class="field">
+        <label for="city">City</label>
+        <select id="city" name="city" required>
+          <option value="">Choose a city</option>
+          {% for value, label in cities %}
+          <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </fieldset>
+
+    <!-- step 3: store -->
+    <fieldset>
+      <legend>Step 3: Store</legend>
+      <div class="field">
+        <label for="store">Store</label>
+        <select id="store" name="store" required>
+          <option value="">Choose a store</option>
+          {% for value, label in stores %}
+          <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="store_other">If other, type the store</label>
+        <input
+          type="text"
+          id="store_other"
+          name="store_other"
+          placeholder="e.g. Emilu's Store"
+        />
+      </div>
+    </fieldset>
+
+    <!-- step 4: branch -->
+    <fieldset>
+      <legend>Step 4: Branch</legend>
+      <div class="field">
+        <label for="branch">Branch name</label>
+        <input
+          type="text"
+          id="branch"
+          name="branch"
+          placeholder="e.g. SM Molino, Maryhomes Palengke"
+          required
+        />
+      </div>
+    </fieldset>
+
+    <!-- step 5: food category -->
+    <fieldset>
+      <legend>Step 5: Food category</legend>
+      <div class="field">
+        <label for="category">Category</label>
+        <select id="category" name="category" required>
+          <option value="">Choose a category</option>
+          {% for value, label in categories %}
+          <option value="{{ value }}">{{ label }}</option>
+          {% endfor %}
+          <option value="other">Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="category_other">If other, type the category</label>
+        <input
+          type="text"
+          id="category_other"
+          name="category_other"
+          placeholder="e.g. Snacks"
+        />
+      </div>
+    </fieldset>
+
+    <!-- step 6: food -->
+    <fieldset>
+      <legend>Step 6: Food</legend>
+      <div class="field">
+        <label for="food">Exact food name</label>
+        <input
+          type="text"
+          id="food"
+          name="food"
+          placeholder="e.g. Rice, Apple"
+          required
+        />
+      </div>
+      <div class="field">
+        <label for="brand">Brand / variant</label>
+        <input
+          type="text"
+          id="brand"
+          name="brand"
+          placeholder="e.g. Jasmine, Fuji (or N/A)"
+        />
+      </div>
+    </fieldset>
+
+    <!-- step 7: quantity -->
+    <fieldset>
+      <legend>Step 7: Quantity</legend>
+    </fieldset>
+
+    <!-- step 8: price and date -->
+    <fieldset>
+      <legend>Step 8: Price and date</legend>
+    </fieldset>
+
+    <button type="submit" class="btn">Submit price</button>
+  </form>
+</main>
+{% endblock %}

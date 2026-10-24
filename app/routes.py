@@ -1,17 +1,48 @@
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, request
 from app import app
+from app.services.catalog import get_add_price_options
 from app.forms import *
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def dashboard():
     comprForm = CompareForm()
-    return render_template("dashboard.html")
+    stats = {"stores": 0, "foods": 0, "users": 0, "prices": 0}
+    activity = [
+        {"username": "Ian", "food": "Jeff",
+            "location": "Justin", "time": "0 hr ago"},
+    ]
+    return render_template(
+        "dashboard.html",
+        comprForm=comprForm,
+        stats=stats,
+        activity=activity,
+    )
 
 
-@app.route("/#popup-add", methods=["POST"])
+@app.route("/add", methods=["GET", "POST"])
 def add_price():
-    form = ProductForm()
-    if form.validate_on_submit():
-        flash('Adding Product "{}"'.format(form.product))
-        return redirect(url_for('/'))
+    if request.method == "POST":
+        flash("Price Submitted.")
+        return redirect(url_for("dashboard"))
+    return render_template("add_price.html", **get_add_price_options())
+
+
+@app.route("/optimize")
+def optimize():
+    return render_template("optimize.html")
+
+
+@app.route("/contributions")
+def contributions():
+    return render_template("contributions.html")
+
+
+@app.route("/history")
+def history():
+    return render_template("history.html")
+
+
+@app.route("/day-summary")
+def day_summary():
+    return render_template("day_summary.html")
