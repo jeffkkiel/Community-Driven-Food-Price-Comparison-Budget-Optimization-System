@@ -20,25 +20,39 @@ class Product(db.Model):
         cascade="all, delete-orphan")
 
     def __repr__(self):
-            return '<Product {}>'.format(self.name)
+        return f'<Product {self.name}>'
 
-#Product has an id, product id, name, price, and relates to product and price_history table
+class Store(db.Model):
+    __tablename__ = "stores"
+
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    name: so.Mapped[str] = so.mapped_column(sa.String(150), unique=True, index=True, nullable=False)
+    location: so.Mapped[str | None] = so.mapped_column(sa.String(255))
+    product_listings: so.Mapped[list["ProductStore"]] = so.relationship(back_populates="store")
+    
+    def __repr__(self):
+        return f"<Store {self.name}>"
+
+#Has the relationship between the product and the store
 class ProductStore(db.Model):
     __tablename__ = "product_stores"
 
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
     product_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey("products.id"), index=True)
-    store_name: so.Mapped[str] = so.mapped_column(sa.String(100))
-    price: so.Mapped[int] = so.mapped_column(sa.Integer)
+    price: so.Mapped[float] = so.mapped_column(sa.Integer)
 
     product: so.Mapped["Product"] = so.relationship(back_populates="stores")
     price_history: so.Mapped[list["PriceHistory"]] = so.relationship(
         back_populates="product_store",
         cascade="all, delete-orphan",
         order_by="PriceHistory.recorded_at")
+
+    store_name: so.Mapped["Store"] = so.relationship(back_populates="products")
     
     def __repr__(self):
         return '<ProductStore {} - {}>'.format(self.store_name, self.price)
+
+
 
 #Product has an id, product id, name, price, date, and relates to product_store table
 class PriceHistory(db.Model):
