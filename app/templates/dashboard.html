@@ -97,6 +97,18 @@
             <input type="text" name="item1" placeholder="Enter first item" />
             <input type="text" name="item2" placeholder="Enter second item" />
           </form>
+          <form action="" method="post" novalidate>
+              {{ comprForm.hidden_tag() }}
+              <p>
+                  {{ comprForm.product1.label }}<br>
+                  {{ comprForm.product1(size=32) }}
+              </p>
+              <p>
+                  {{ comprForm.product2.label }}<br>
+                  {{ comprForm.product1(size=32) }}
+              </p>
+              <p>{{ comprForm.submit() }}</p>
+          </form>
         </section>
       </div>
 
