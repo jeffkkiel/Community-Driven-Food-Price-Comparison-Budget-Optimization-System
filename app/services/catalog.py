@@ -1,4 +1,4 @@
-# for add_price values and more?
+# for add_product values and more?
 from decimal import Decimal
 from app import app
 

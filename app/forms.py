@@ -1,18 +1,25 @@
 from flask_wtf import FlaskForm
 from wtforms import *
-from wtforms.validators import DataRequired, Optional, NumberRange
+from wtforms.validators import DataRequired, Optional, NumberRange, Length, ValidationError
 
+CATEGORIES = [
+    "Fruits", "Vegetables", "Meat", "Seafood", "Chilled", "Frozen", "Snacks", "Sweets", "Beverages"
+]
+
+LOCATIONS = [
+    "Bacoor, Cavite", "Dasmariñas, Cavite", "Imus, Cavite", "Lopez, Quezon", "New York City, New York"
+]
 
 class ProductForm(FlaskForm):
-    product = StringField('Product Name', validators=[DataRequired()])
+    product = StringField('Product Name', validators=[DataRequired(), Length(max=150)])
+    category = SelectField('Category', choices=[(c, c) for c in CATEGORIES], validators=[DataRequired()])
     description = StringField('Add Description', validators=[Optional()])
     # gagamit ba tayo ng image?
     img = FileField('Upload an Image')
-    store = StringField('Which Store?', coerce=int,
-                        validators=[DataRequired()])
-    # temp maganda kung may drop down tas pwede magsearch ng existing store, o magadd ng bago
-    price = DecimalField('Price', places=2, validators=[
-                         DataRequired(), NumberRange(min=0)])
+    location = SelectField('Address', choices=[("", "Choose a location")] + [(loc, loc) for loc in LOCATIONS], validators=[DataRequired()])
+    store = SelectField('Store', choices=[("", "Choose a store"), ("__new__", "Add a new store...")], validators=[DataRequired()])
+    store_name = StringField("New Store Name", validators=[Optional(), Length(max=150)])
+    price = DecimalField('Price (₱)', places = 2, validators=[DataRequired(), NumberRange(min=0)])
     submit = SubmitField('Add Product')
 
 
