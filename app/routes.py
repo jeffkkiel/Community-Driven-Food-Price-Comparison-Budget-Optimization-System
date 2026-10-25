@@ -5,11 +5,11 @@ from decimal import Decimal
 
 from datetime import datetime, timezone, timedelta, date, time as dtime
 
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, session
 from werkzeug.utils import secure_filename
 import sqlalchemy as sa
 
-from sqlalchemy import func, session
+from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 from app import app, db
 from app.forms import *
@@ -20,7 +20,8 @@ from app.services.helper import time_ago
 @app.route("/", methods=["GET", "POST"])
 def dashboard():
     form = CompareForm()
-    products = db.session.scalars(db.select(Product).order_by(Product.name)).all()
+    products = db.session.scalars(
+        db.select(Product).order_by(Product.name)).all()
     form.product.choices = [(str(prod.id), prod.name) for prod in products]
     selected_ids = session.get('compare_products', [])
 
@@ -31,7 +32,8 @@ def dashboard():
         session['compare_products'] = selected_ids
         return redirect(url_for('dashboard'))
 
-    selected_products = db.session.scalars(db.select(Product).where(Product.id.in_(selected_ids))).all() if selected_ids else []
+    selected_products = db.session.scalars(db.select(Product).where(
+        Product.id.in_(selected_ids))).all() if selected_ids else []
 
     manila = timezone(timedelta(hours=8))
     start_of_day = (
