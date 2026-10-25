@@ -61,14 +61,14 @@
         method="post"
         novalidate
       >
-        {{ comprForm.hidden_tag() }}
+        {{ form.hidden_tag() }}
         <div class="field">
-          {{ comprForm.product1.label }} {{ comprForm.product1(size=32) }}
+          {{ form.product1.label }} {{ form.product1(size=32) }}
         </div>
         <div class="field">
-          {{ comprForm.product2.label }} {{ comprForm.product2(size=32) }}
+          {{ form.product2.label }} {{ form.product2(size=32) }}
         </div>
-        {{ comprForm.submit(class="btn") }}
+        {{ form.submit(class="btn") }}
       </form>
 
       {% if result %}
