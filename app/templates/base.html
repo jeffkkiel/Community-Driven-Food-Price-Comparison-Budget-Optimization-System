@@ -12,14 +12,7 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/global.css') }}"
     />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/dashboard.css') }}"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/add_product.css') }}"
-    />
+    {% block head %}{% endblock %}
   </head>
   <body>
     <!-- Navigation Bar -->

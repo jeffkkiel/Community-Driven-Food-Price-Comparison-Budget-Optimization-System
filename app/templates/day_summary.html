@@ -13,7 +13,57 @@ head %}
   <h1>Day Summary</h1>
   <p>Pick a date and see the prices reported that day.</p>
 
-  <section class="summary"></section>
-</main>
+  <!-- pick date -->
+  <form class="pick-date" method="get" action="{{ url_for('day_summary') }}">
+    <label for="date">Date</label>
+    <input
+      type="date"
+      id="date"
+      name="date"
+      value="{{ chosen.isoformat() }}"
+      max="{{ today.isoformat() }}"
+      onchange="this.form.submit()"
+    />
+    <noscript><button class="btn" type="submit">Show</button></noscript>
+  </form>
 
+  <!-- summary of data in that date -->
+  <section class="summary">
+    <h2>{{ chosen.strftime("%B %d, %Y") }}</h2>
+    <p class="count">
+      {{ entries|length }} price report{{ "" if entries|length == 1 else "s" }}
+    </p>
+
+    {% if entries %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Food</th>
+            <th>Category</th>
+            <th>Store</th>
+            <th>Location</th>
+            <th class="num">Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in entries %}
+          <tr>
+            <td>{{ e.time }}</td>
+            <td>{{ e.food }}</td>
+            <td>{{ e.category }}</td>
+            <td>{{ e.store }}</td>
+            <td>{{ e.location }}</td>
+            <td class="num">₱{{ "%.2f"|format(e.price) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="empty">No prices were reported on this day.</p>
+    {% endif %}
+  </section>
+</main>
 {% endblock %}

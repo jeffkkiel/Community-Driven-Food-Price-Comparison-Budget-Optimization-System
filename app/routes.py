@@ -3,9 +3,9 @@ import os
 from uuid import uuid4
 from decimal import Decimal
 
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta, date, time as dtime
 
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, request
 from werkzeug.utils import secure_filename
 import sqlalchemy as sa
 
@@ -236,4 +236,47 @@ def history():
 
 @app.route("/day-summary")
 def day_summary():
-    return render_template("day_summary.html")
+    manila = timezone(timedelta(hours=8))
+    today = datetime.now(manila).date()
+
+    try:
+        chosen = date.fromisoformat(request.args.get("date", ""))
+        if chosen > today:
+            chosen = today
+
+    except ValueError:
+        chosen = today
+
+    start = datetime.combine(
+        chosen, dtime.min, tzinfo=manila).astimezone(timezone.utc)
+    end = start + timedelta(days=1)
+
+    rows = db.session.execute(
+        db.select(PriceHistory, Product, Store)
+        .join(ProductStore, PriceHistory.product_store_id == ProductStore.id)
+        .join(Product, ProductStore.product_id == Product.id)
+        .join(Store, ProductStore.store_id == Store.id)
+        .where(
+            PriceHistory.recorded_at >= start,
+            PriceHistory.recorded_at < end
+        )
+        .order_by(PriceHistory.recorded_at.desc())
+    ).all()
+
+    entries = []
+
+    for history, product, store in rows:
+        recorded = history.recorded_at
+
+        if recorded.tzinfo is None:
+            recorded = recorded.replace(tzinfo=timezone.utc)
+
+        entries.append({
+            "time": recorded.astimezone(manila).strftime("%I:%M %p"),
+            "food": product.name,
+            "category": product.category,
+            "store": store.name,
+            "location": store.location,
+            "price": history.price
+        })
+    return render_template("day_summary.html", chosen=chosen, today=today, entries=entries)
