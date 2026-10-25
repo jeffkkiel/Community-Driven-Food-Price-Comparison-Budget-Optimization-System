@@ -1,4 +1,9 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %} {% block head %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/dashboard.css') }}"
+/>
+{% endblock %} {% block content %}
 <main class="layout">
   <!-- Left Section -->
   <div class="main">
@@ -77,11 +82,10 @@
     <div class="panel panel-dark">
       <h3>Community</h3>
       <div class="statistics">
-        {% set stats = stats | default({}) %}
         <div><strong>{{ stats.stores }}</strong><span>Stores</span></div>
         <div><strong>{{ stats.foods }}</strong><span>Foods</span></div>
-        <div><strong>{{ stats.users }}</strong><span>Users</span></div>
-        <div><strong>{{ stats.prices }}</strong><span>Prices</span></div>
+        <div><strong>{{ stats.locations }}</strong><span>Locations</span></div>
+        <div><strong>{{ stats.today }}</strong><span>Updates today</span></div>
       </div>
     </div>
 
@@ -90,8 +94,8 @@
       <ul class="feed">
         {% for item in activity | default([]) %}
         <li>
-          <b>{{ item.username }}</b> added {{ item.food }} at {{ item.location
-          }}
+          <b>{{ item.food }}</b> - ₱{{ "%.2f"|format(item.price)}} at {{
+          item.store }}, {{ item.location}}
           <time>{{ item.time }}</time>
         </li>
         {% else %}
