@@ -3,6 +3,8 @@ import os
 from uuid import uuid4
 from decimal import Decimal
 
+from datetime import datetime, timezone, timedelta
+
 from flask import render_template, flash, redirect, url_for
 from werkzeug.utils import secure_filename
 import sqlalchemy as sa
@@ -19,11 +21,18 @@ from app.services.helper import time_ago
 def dashboard():
     comprForm = CompareForm()
 
+    manila = timezone(timedelta(hours=8))
+    start_of_day = (
+        datetime.now(manila)
+        .replace(hour=0, minute=0, second=0, microsecond=0)
+        .astimezone(timezone.utc)
+    )
+
     stats = {
         "stores": db.session.scalar(db.select(func.count(Store.id))),
         "foods": db.session.scalar(db.select(func.count(Product.id))),
         "locations": db.session.scalar(db.select(func.count(func.distinct(Store.location)))),
-        "prices": db.session.scalar(db.select(func.count(PriceHistory.id))),
+        "today": db.session.scalar(db.select(func.count(PriceHistory.id)).where(PriceHistory.recorded_at >= start_of_day)),
     }
 
     recent = db.session.execute(
