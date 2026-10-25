@@ -24,7 +24,6 @@ class Product(db.Model):
 
 
 # Store information, shared by multiple product listings.
-#debug: let store name be unique to only one location
 class Store(db.Model):
     __tablename__ = "stores"
     __table_args__ = (sa.UniqueConstraint("name", "location", name="uq_store_name_location"),)

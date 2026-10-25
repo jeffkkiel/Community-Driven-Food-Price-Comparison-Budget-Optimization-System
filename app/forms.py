@@ -33,6 +33,4 @@ class ProductForm(FlaskForm):
 
 
 class CompareForm(FlaskForm):
-    product1 = SelectField('First Product', choices=[("", "Choose a product")], validators=[DataRequired()])
-    product2 = SelectField('Second Product', choices=[("", "Choose a product")], validators=[DataRequired()])
-    submit = SubmitField('Compare')
+    product = SelectField('First Product', choices=[], validators=[DataRequired()])
