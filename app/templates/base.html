@@ -16,6 +16,10 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/dashboard.css') }}"
     />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/add_product.css') }}"
+    />
   </head>
   <body>
     <!-- Navigation Bar -->
@@ -43,8 +47,14 @@
         </button>
       </form>
     </header>
-
-    {% block content %}{% endblock %}
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %}
+    <div class="flash-wrap">
+      {% for category, message in messages %}
+      <p class="flash flash-{{ category }}">{{ message }}</p>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %} {% block content %}{% endblock %}
 
     <!-- Footer -->
     <footer class="footer">
