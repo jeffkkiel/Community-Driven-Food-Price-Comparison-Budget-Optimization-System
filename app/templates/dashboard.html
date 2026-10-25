@@ -90,8 +90,8 @@
       <ul class="feed">
         {% for item in activity | default([]) %}
         <li>
-          <b>{{ item.username }}</b> added {{ item.food }} at {{ item.location
-          }}
+          <b>{{ item.food }}</b> ₱{{ "%.2f"|format(item.price)}} at {{
+          item.store }}, {{ item.location}}
           <time>{{ item.time }}</time>
         </li>
         {% else %}
