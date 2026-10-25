@@ -14,7 +14,7 @@ class ProductForm(FlaskForm):
     product = StringField('Product Name', validators=[DataRequired(), Length(max=150)])
     category = SelectField('Category', choices=[(c, c) for c in CATEGORIES], validators=[DataRequired()])
     description = StringField('Add Description', validators=[Optional()])
-    # gagamit ba tayo ng image?
+    # gagamit ba tayo ng image? idk baka astig lang
     img = FileField('Upload an Image', validators=[Optional()])
     location = SelectField('Address', choices=[("", "Choose a location")] + [(loc, loc) for loc in LOCATIONS], validators=[DataRequired()])
     store = SelectField('Store', choices=[("", "Choose a store"), ("__new__", "Add a new store...")], validators=[DataRequired()])
@@ -25,6 +25,6 @@ class ProductForm(FlaskForm):
 
 
 class CompareForm(FlaskForm):
-    product1 = StringField('First Product', validators=[DataRequired()])
-    product2 = StringField('Second Product', validators=[DataRequired()])
+    product1 = SelectField('First Product', choices=[("", "Choose a product")], validators=[DataRequired()])
+    product2 = SelectField('Second Product', choices=[("", "Choose a product")], validators=[DataRequired()])
     submit = SubmitField('Compare')

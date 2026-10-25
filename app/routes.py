@@ -15,7 +15,32 @@ from app.models import *
 
 @app.route("/", methods=["GET", "POST"])
 def dashboard():
-    comprForm = CompareForm()
+    form = CompareForm()
+
+    if form.validate_on_submit():
+        try:
+            product1_id = int(form.product1.data)
+        except (ValueError, TypeError):
+            flash("Please select a valid product.")
+            return render_template("dashboard.html", form=form)
+        product1 = db.session.get(ProductStore, product1_id)
+        if product1 is None:
+            flash("The selected product does not exist.")
+            return render_template("dashboard.html", form=form)
+
+        
+        try:
+            product2_id = int(form.product2.data)
+        except (ValueError, TypeError):
+            flash("Please select a valid product.")
+            return render_template("dashboard.html", form=form)
+        product2 = db.session.get(ProductStore, product2_id)
+        if product2 is None:
+            flash("The selected product does not exist.")
+            return render_template("dashboard.html", form=form)
+
+
+        
     stats = {"stores": 0, "foods": 0, "users": 0, "prices": 0}
     activity = [
         {"username": "Ian", "food": "Jeff",
@@ -23,7 +48,7 @@ def dashboard():
     ]
     return render_template(
         "dashboard.html",
-        comprForm=comprForm,
+        form=form,
         stats=stats,
         activity=activity,
     )
