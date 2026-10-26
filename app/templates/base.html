@@ -29,17 +29,20 @@
         </div>
       </a>
 
-      <form class="search-bar" action="#">
+      <form class="search-bar" action="{{ url_for('dashboard') }}" method="get">
         <input
           type="search"
           name="q"
           placeholder="Search food prices here..."
+          value="{{ q | default('') }}"
+          required
         />
         <button type="submit" aria-label="Search">
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
       </form>
     </header>
+
     {% with messages = get_flashed_messages(with_categories=true) %} {% if
     messages %}
     <div class="flash-wrap">

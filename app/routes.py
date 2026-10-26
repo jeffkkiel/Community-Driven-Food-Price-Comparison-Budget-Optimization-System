@@ -4,6 +4,7 @@ from uuid import uuid4
 from decimal import Decimal
 
 from datetime import datetime, timezone, timedelta, date, time as dtime
+from app.services.search import search_prices
 
 from flask import render_template, flash, redirect, url_for, request, session
 from werkzeug.utils import secure_filename
@@ -69,12 +70,17 @@ def dashboard():
         for history, product, store in recent
     ]
 
+    q = request.args.get("q", "").strip()
+    groups = search_prices(q) if q else None
+
     return render_template(
         "dashboard.html",
         form=form,
         stats=stats,
         activity=activity,
         selected_products=selected_products,
+        q=q,
+        groups=groups,
     )
 
 

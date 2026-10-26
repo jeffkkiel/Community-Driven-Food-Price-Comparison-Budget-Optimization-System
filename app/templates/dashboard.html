@@ -17,6 +17,41 @@
       <p class="hero-date" id="hero-date">MM/DD/YEAR</p>
     </section>
 
+    <!-- search -->
+    {% if groups is not none %}
+    <section class="search-results">
+      <div class="search-head">
+        <h2>Results for "{{ q }}"</h2>
+        <p class="count">
+          <a href="{{ url_for('dashboard') }}">Clear search</a>
+        </p>
+      </div>
+
+      {% for location, items in groups.items() %}
+      <h3 class="loc-title">
+        <i class="fa-solid fa-location-dot"></i> {{ location }}
+        <span class="loc-count">{{ items|length }}</span>
+      </h3>
+      <ul class="result-list">
+        {% for r in items %}
+        <li class="result-item">
+          <div class="result-info">
+            <strong class="result-food">{{ r.food }}</strong>
+            <span class="result-store">{{ r.store }}</span>
+          </div>
+          <div class="result-price">
+            <strong>₱{{ "%.2f"|format(r.price) }}</strong>
+            <time>{{ r.date }}</time>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="empty">No food found for "{{ q }}". Try a shorter word.</p>
+      {% endfor %}
+    </section>
+    {% endif %}
+
     <!-- The Big 2 Cards -->
     <section class="big-cards">
       <a href="{{ url_for('add_product') }}" class="card card-big">
