@@ -25,24 +25,20 @@ def setup_product_form(form):
     stores = db.session.scalars(db.select(Store).order_by(Store.name, Store.location)).all()
 
     form.store.choices = [
-        ("", "Choose a store"),
+        ("", "Choose a store"), ("__new__", "Add a new store..."),
         *[
             (str(store.id), f"{store.name} — {store.location}")
             for store in stores
-        ],
-        ("__new__", "Add a new store..."),
-    ]
+        ],]
 
     products = db.session.scalars(db.select(Product).order_by(Product.name)).all()
     
     form.product.choices = [
-        ("", "Choose a product"),
+        ("", "Choose a product"), ("__new__", "Add a new product..."),
         *[
             (str(product.id), f"{product.name}")
             for product in products
-        ],
-        ("__new__", "Add a new product..."),
-    ]
+        ],]
 
 
 def get_or_create_store(form):

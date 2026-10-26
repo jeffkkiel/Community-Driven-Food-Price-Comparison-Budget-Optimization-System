@@ -25,16 +25,11 @@
     cursor: pointer;
 }
 
-#new-store-group {
-    padding-left: 14px;
-    border-left: 3px solid var(--green);
-}
-
+#new-store-group,
 #new-product-group {
     padding-left: 14px;
     border-left: 3px solid var(--green);
 }
-
 
 #price-preview {
     margin: 4px 0 20px;
