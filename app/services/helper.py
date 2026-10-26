@@ -20,3 +20,14 @@ def time_ago(dt):
         return f"{hours} hr ago"
 
     return f"{days} day{'s' if days != 1 else ''} ago"
+
+def format_number(n, cap=1_000_000_000_000_000):
+    if abs(n) >= cap:
+        return "really big number"
+
+    for threshold, suffix in [(1_000_000_000_000, "T"), (1_000_000_000, "B"), (1_000_000, "M"), (1_000, "K")]:
+        if abs(n) >= threshold:
+            value = n / threshold
+            return f"{value:.1f}".rstrip("0").rstrip(".") + suffix
+
+    return str(n)

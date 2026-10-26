@@ -1,13 +1,7 @@
-
-import os
-from uuid import uuid4
-from decimal import Decimal
-
 from datetime import datetime, timezone, timedelta, date, time as dtime
 from app.services.search import search_prices
 
 from flask import render_template, flash, redirect, url_for, request, session
-from werkzeug.utils import secure_filename
 import sqlalchemy as sa
 
 from sqlalchemy import func
@@ -15,7 +9,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from app import app, db
 from app.forms import *
 from app.models import *
-from app.services.helper import time_ago
+from app.services.helper import time_ago, format_number
 from app.services.add_product import setup_product_form, validate_category_location, save_product_submission
 
 from sqlalchemy.exc import SQLAlchemyError
@@ -67,7 +61,7 @@ def dashboard():
     activity = [
         {
             "food": product.name,
-            "price": history.price,
+            "price": format_number(history.price),
             "store": store.name,
             "location": store.location,
             "time": time_ago(history.recorded_at),
@@ -136,6 +130,10 @@ def contributions():
 def history():
     return render_template("history.html")
 
+@app.route("/compare", methods=["GET", "POST"])
+def compare():
+    form = CompareForm
+    return render_template("compare.html", form=form)
 
 @app.route("/day-summary")
 def day_summary():

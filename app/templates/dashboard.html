@@ -128,7 +128,7 @@
       <ul class="feed">
         {% for item in activity | default([]) %}
         <li>
-          <b>{{ item.food }}</b> - ₱{{ "%.2f"|format(item.price)}} at {{
+          <b>{{ item.food }}</b> - ₱{{ item.price }} at {{
           item.store }}, {{ item.location}}
           <time>{{ item.time }}</time>
         </li>
