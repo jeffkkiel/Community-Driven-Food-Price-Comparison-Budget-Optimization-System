@@ -9,7 +9,15 @@ storeSelect.addEventListener("change", toggleNewStore);
 toggleNewStore();
 
 
+const productSelect = document.getElementById("product_select");
+const newProductGroup = document.getElementById("new-product-group");
 
+function toggleNewProduct() {
+  newProductGroup.hidden = productSelect.value !== "__new__";
+}
+
+productSelect.addEventListener("change", toggleNewProduct);
+toggleNewProduct();
 
 const quantityInput = document.getElementById("quantity");
 const totalPriceInput = document.getElementById("total_price");

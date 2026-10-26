@@ -23,8 +23,14 @@
     <!-- Step 1: Product Name -->
     <!-- wala nang brand name, variant, unit. lahat nasa pangalan na lang -->
     <div class="form-group">
-      {{ form.product.label }} {{ form.product(placeholder="e.g. Jasmine Rice 1
-      kg") }} {% for error in form.product.errors %}
+      {{ form.product.label }} {{ form.product(id="product_select") }} {% for error in form.product.errors %}
+      <span class="error">{{ error }}</span>
+      {% endfor %}
+    </div>
+
+    <!-- Shown only when the user chooses to add a product -->
+    <div class="form-group" id="new-product-group" hidden>
+      {{ form.product_name.label }} {{ form.product_name(placeholder="e.g. Jasmine Rice 1kg") }} {% for error in form.product_name.errors %}
       <span class="error">{{ error }}</span>
       {% endfor %}
     </div>

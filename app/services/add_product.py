@@ -21,10 +21,8 @@ def validate_category_location(form):
 
 
 def setup_product_form(form):
-    #Populate the store dropdown.
-    stores = db.session.scalars(
-        db.select(Store).order_by(Store.name, Store.location)
-    ).all()
+    #populate store and product dropdowns.
+    stores = db.session.scalars(db.select(Store).order_by(Store.name, Store.location)).all()
 
     form.store.choices = [
         ("", "Choose a store"),
@@ -33,6 +31,17 @@ def setup_product_form(form):
             for store in stores
         ],
         ("__new__", "Add a new store..."),
+    ]
+
+    products = db.session.scalars(db.select(Product).order_by(Product.name)).all()
+    
+    form.product.choices = [
+        ("", "Choose a product"),
+        *[
+            (str(product.id), f"{product.name}")
+            for product in products
+        ],
+        ("__new__", "Add a new product..."),
     ]
 
 
@@ -83,26 +92,34 @@ def get_or_create_store(form):
 
 
 def get_or_create_product(form):
-    # reuse existing product with the same name.
-    product_name = (form.product.data or "").strip()
+    # let user choose existing product or make new one
+    if form.product.data == "__new__":
+        product_name = (form.product_name.data or "").strip()
 
-    if not product_name:
-        raise ValueError("Please enter a product name.")
+        if not product_name:
+            form.product_name.errors.append(
+                "Enter a name for the new product."
+            )
+            return None
 
-    product = db.session.scalar(
-        db.select(Product).where(
-            func.lower(Product.name) == product_name.lower()
-        )
-    )
+        product = db.session.scalar(db.select(Product).where(func.lower(Product.name) == product_name.lower()))
+
+        if product is None:
+            product = Product(name=product_name, description=form.description.data or None, category=form.category.data)
+            db.session.add(product)
+            db.session.flush()
+
+        return product
+    # chcik if the selected store actually exists.
+    try:
+        product_id = int(form.product.data)
+    except (ValueError, TypeError):
+        raise ValueError("Please select a valid product.")
+
+    product = db.session.get(Product, product_id)
 
     if product is None:
-        product = Product(
-            name=product_name,
-            description=form.description.data or None,
-            category=form.category.data,
-        )
-        db.session.add(product)
-        db.session.flush()
+        raise ValueError("The selected product does not exist.")
 
     return product
 
@@ -162,11 +179,11 @@ def record_price(listing, price):
 def save_product_submission(form):
     #submit lahat sa db
     store = get_or_create_store(form)
-
     if store is None:
         return False
-
     product = get_or_create_product(form)
+    if product is None:
+        return False
     save_product_image(form, product)
 
     price = form.total_price.data / form.quantity.data

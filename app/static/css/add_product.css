@@ -30,6 +30,12 @@
     border-left: 3px solid var(--green);
 }
 
+#new-product-group {
+    padding-left: 14px;
+    border-left: 3px solid var(--green);
+}
+
+
 #price-preview {
     margin: 4px 0 20px;
     padding: 12px 16px;
