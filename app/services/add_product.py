@@ -10,34 +10,36 @@ from app.models import Product, Store, ProductStore, PriceHistory
 
 
 def validate_category_location(form):
-    #Validate the selected category and location.
-    if form.category.data not in form.category.choices:
+    # Validate the selected category and location.
+    if form.category.data not in dict(form.category.choices):
         return "Please choose a valid category."
 
-    if form.location.data not in form.location.choices:
+    if form.location.data not in dict(form.location.choices):
         return "Please choose a valid location."
 
     return None
 
 
 def setup_product_form(form):
-    #populate store and product dropdowns.
-    stores = db.session.scalars(db.select(Store).order_by(Store.name, Store.location)).all()
+    # populate store and product dropdowns.
+    stores = db.session.scalars(
+        db.select(Store).order_by(Store.name, Store.location)).all()
 
     form.store.choices = [
         ("", "Choose a store"), ("__new__", "Add a new store..."),
         *[
-            (str(store.id), f"{store.name} — {store.location}")
-            for store in stores
+            (str(s.id), s.name, {"data-location": s.location})
+            for s in stores
         ],]
 
-    products = db.session.scalars(db.select(Product).order_by(Product.name)).all()
-    
+    products = db.session.scalars(
+        db.select(Product).order_by(Product.name)).all()
+
     form.product.choices = [
         ("", "Choose a product"), ("__new__", "Add a new product..."),
         *[
-            (str(product.id), f"{product.name}")
-            for product in products
+            (str(p.id), p.name, {"data-category": p.category})
+            for p in products
         ],]
 
 
@@ -48,7 +50,7 @@ def get_or_create_store(form):
 
         if not store_name:
             form.store_name.errors.append(
-                "Enter a name for the new store."
+                "Enter name for the new store."
             )
             return None
 
@@ -98,10 +100,12 @@ def get_or_create_product(form):
             )
             return None
 
-        product = db.session.scalar(db.select(Product).where(func.lower(Product.name) == product_name.lower()))
+        product = db.session.scalar(db.select(Product).where(
+            func.lower(Product.name) == product_name.lower()))
 
         if product is None:
-            product = Product(name=product_name, description=form.description.data or None, category=form.category.data)
+            product = Product(
+                name=product_name, description=form.description.data or None, category=form.category.data)
             db.session.add(product)
             db.session.flush()
 
@@ -173,7 +177,7 @@ def record_price(listing, price):
 
 
 def save_product_submission(form):
-    #submit lahat sa db
+    # submit lahat sa db
     store = get_or_create_store(form)
     if store is None:
         return False

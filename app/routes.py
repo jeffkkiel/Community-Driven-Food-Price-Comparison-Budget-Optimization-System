@@ -15,8 +15,6 @@ from app.services.add_product import setup_product_form, validate_category_locat
 from sqlalchemy.exc import SQLAlchemyError
 
 
-
-
 @app.route("/", methods=["GET", "POST"])
 def dashboard():
     form = CompareForm()
@@ -130,10 +128,12 @@ def contributions():
 def history():
     return render_template("history.html")
 
+
 @app.route("/compare", methods=["GET", "POST"])
 def compare():
     form = CompareForm
     return render_template("compare.html", form=form)
+
 
 @app.route("/day-summary")
 def day_summary():
