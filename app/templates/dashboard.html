@@ -86,31 +86,6 @@
       </a>
     </section>
 
-    <!-- Comparing Section -->
-    <section class="compare" id="compare">
-      <h2>Compare Prices</h2>
-      <p>Pick foods to compare their prices across stores.</p>
-
-      <form
-        action="{{ url_for('dashboard') }}#compare"
-        method="post"
-        novalidate
-      >
-        {{ form.hidden_tag() }}
-        <div class="field">{{ form.product.label }} {{ form.product() }}</div>
-        {{ form.submit(class="btn") }}
-      </form>
-
-      {% if selected_products %}
-      <ul class="selected">
-        {% for p in selected_products %}
-        <li>{{ p.name }}</li>
-        {% endfor %}
-      </ul>
-      {% endif %}
-    </section>
-  </div>
-
   <!-- Right Column for Statistics -->
   <aside class="side-column">
     <div class="panel panel-dark">

@@ -5,8 +5,53 @@ content %}
   <a href="{{ url_for('dashboard') }}" class="back-link">
     <i class="fa-solid fa-arrow-left"></i> Back to dashboard
   </a>
-
   <h1>Compare Products</h1>
+
+
+  
+<form method="POST" action="{{ url_for('compare') }}">
+  {{ form.hidden_tag() }}
+
+  <div class="form-group">
+      {{ form.products.label }}
+      {{ form.products(id="products_select") }}
+
+      {% for error in form.products.errors %}
+          <span class="error">{{ error }}</span>
+      {% endfor %}
+  </div>
+
+  {{ form.submit(class="btn btn-primary") }}
+</form>
+
+<div class="table-container">
+  <table class="content-table">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Store</th>
+        <th>Location</th>
+        <th>Latest Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for list in listing %}
+      <tr>
+        <td>{{ list.product.name }}</td>
+        <td>{{ list.store.name }}</td>
+        <td>{{ list.store.location }}</td>
+        <td>{{ list.price.price }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+
+
+
+
 </main>
 
 {% endblock %}

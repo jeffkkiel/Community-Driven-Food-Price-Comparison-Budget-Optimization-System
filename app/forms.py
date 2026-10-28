@@ -26,6 +26,6 @@ class ProductForm(FlaskForm):
 
 
 class CompareForm(FlaskForm):
-    product = SelectField('Add a food to compare',
+    products = SelectMultipleField('Add a food to compare',
                           choices=[], validators=[DataRequired()])
     submit = SubmitField('Add')

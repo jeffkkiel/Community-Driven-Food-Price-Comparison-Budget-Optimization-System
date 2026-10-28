@@ -17,21 +17,21 @@ from sqlalchemy.exc import SQLAlchemyError
 
 @app.route("/", methods=["GET", "POST"])
 def dashboard():
-    form = CompareForm()
-    products = db.session.scalars(
-        db.select(Product).order_by(Product.name)).all()
-    form.product.choices = [(str(prod.id), prod.name) for prod in products]
-    selected_ids = session.get('compare_products', [])
+    # form = CompareForm()
+    # products = db.session.scalars(
+    #     db.select(Product).order_by(Product.name)).all()
+    # form.product.choices = [(str(prod.id), prod.name) for prod in products]
+    # selected_ids = session.get('compare_products', [])
 
-    if form.validate_on_submit():
-        product_id = form.product.data
-        if product_id not in selected_ids:
-            selected_ids.append(product_id)
-        session['compare_products'] = selected_ids
-        return redirect(url_for('dashboard'))
+    # if form.validate_on_submit():
+    #     product_id = form.product.data
+    #     if product_id not in selected_ids:
+    #         selected_ids.append(product_id)
+    #     session['compare_products'] = selected_ids
+    #     return redirect(url_for('dashboard'))
 
-    selected_products = db.session.scalars(db.select(Product).where(
-        Product.id.in_(selected_ids))).all() if selected_ids else []
+    # selected_products = db.session.scalars(db.select(Product).where(
+    #     Product.id.in_(selected_ids))).all() if selected_ids else []
 
     manila = timezone(timedelta(hours=8))
     start_of_day = (
@@ -72,13 +72,13 @@ def dashboard():
 
     return render_template(
         "dashboard.html",
-        form=form,
+
         stats=stats,
         activity=activity,
-        selected_products=selected_products,
+        
         q=q,
         groups=groups,
-    )
+    )         # form=form, # selected_products=selected_products,
 
 
 @app.route("/add", methods=["GET", "POST"])
@@ -129,10 +129,55 @@ def history():
     return render_template("history.html")
 
 
+
 @app.route("/compare", methods=["GET", "POST"])
 def compare():
-    form = CompareForm
-    return render_template("compare.html", form=form)
+    form = CompareForm()
+
+    products = db.session.scalars(db.select(Product).order_by(Product.name)).all()
+    form.products.choices = [(str(product.id), product.name)for product in products]
+    chosen_listings_rows = []
+
+    if form.validate_on_submit():
+        try:
+            product_ids = [int(pid) for pid in form.products.data]
+        except (ValueError, TypeError):
+            raise ValueError("Please select valid products.")
+        # check if product israel
+        selected_products = db.session.scalars(
+            db.select(Product).where(Product.id.in_(product_ids))
+        ).all()
+
+        if len(selected_products) != len(set(product_ids)):
+            raise ValueError("One or more selected products do not exist.")
+
+        #find the latest price for each listing
+        latest_prices = (db.select(PriceHistory.product_store_id, db.func.max(PriceHistory.id).label("latest_id"))
+            .group_by(PriceHistory.product_store_id) .subquery())
+
+        chosen_listings_rows = db.session.execute(
+            db.select(ProductStore, Product, Store, PriceHistory)
+            .join(Product, ProductStore.product_id == Product.id)
+            .join(Store, ProductStore.store_id == Store.id)
+            .outerjoin(latest_prices, latest_prices.c.product_store_id == ProductStore.id)
+            .outerjoin(PriceHistory, PriceHistory.id == latest_prices.c.latest_id)
+            .where(Product.id.in_(product_ids))
+            .order_by(Product.name, Store.name)
+        ).all()
+
+    chosen_listings = []
+    for listing, product, stor_loc, price in chosen_listings_rows:
+        chosen_listings.append({
+            'listing': listing,
+            'product': product,
+            'store': stor_loc,
+            'price': price
+        })
+    return render_template(
+        "compare.html",
+        form=form,
+        listing=chosen_listings
+    )
 
 
 @app.route("/day-summary")
