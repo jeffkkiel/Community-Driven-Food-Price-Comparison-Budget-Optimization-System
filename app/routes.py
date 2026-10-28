@@ -1,6 +1,12 @@
 from datetime import datetime, timezone, timedelta, date, time as dtime
 from app.services.search import search_prices
 
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+import urllib.request
+
 from flask import render_template, flash, redirect, url_for, request, session
 import sqlalchemy as sa
 
@@ -235,10 +241,12 @@ def nuke_db():
     db.drop_all()
     db.create_all()
     
-    return dashboard()
+    return redirect('/')
 
 @app.route('/update')
 def deploy():
+    pa_token = os.environ.get("PA_API_TOKEN")
+    
     result = subprocess.run(
         ['git', 'pull'], 
         cwd='/home/CommunityFoodPrice/foodprice',
@@ -246,8 +254,16 @@ def deploy():
         text=True
     )
     
-    if result.returncode == 0:
-        return dashboard()
-    else:
-        return f"there was an error updating the website. Error: {result.stderr}"
+    if result.returncode != 0:
+        return f"there was an error running `git pull`. Error: {result.stderr}"
         
+    reload_url = f"https://www.pythonanywhere.com/api/v0/user/CommunityFoodPrice/webapps/CommunityFoodPrice.pythonanywhere.com/reload/"
+    req = urllib.request.Request(reload_url, method='POST')
+    req.add_header('Authorization', f'Token {pa_token}')
+
+    try:
+        urllib.request.urlopen(req)
+    except Exception as error:
+        return f"git pulled successfully but api failed. error: {error}"
+
+    return redirect('/')
