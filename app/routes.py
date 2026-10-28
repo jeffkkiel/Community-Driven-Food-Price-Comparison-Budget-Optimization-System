@@ -14,6 +14,8 @@ from app.services.add_product import setup_product_form, validate_category_locat
 
 from sqlalchemy.exc import SQLAlchemyError
 
+# for perm website auto-update through /update route
+import subprocess
 
 @app.route("/", methods=["GET", "POST"])
 def dashboard():
@@ -226,3 +228,26 @@ def day_summary():
             "price": history.price
         })
     return render_template("day_summary.html", chosen=chosen, today=today, entries=entries)
+
+@app.route('/nukedb')
+def nuke_db():
+    
+    db.drop_all()
+    db.create_all()
+    
+    return dashboard()
+
+@app.route('/update')
+def deploy():
+    result = subprocess.run(
+        ['git', 'pull'], 
+        cwd='/home/CommunityFoodPrice/foodprice',
+        capture_output=True, 
+        text=True
+    )
+    
+    if result.returncode == 0:
+        return dashboard()
+    else:
+        return f"there was an error updating the website. Error: {result.stderr}"
+        
