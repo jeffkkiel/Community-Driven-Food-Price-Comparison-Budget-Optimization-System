@@ -7,7 +7,12 @@ CATEGORIES = [
 ]
 
 LOCATIONS = [
-    "Bacoor, Cavite", "Dasmariñas, Cavite", "Imus, Cavite", "Lopez, Quezon", "New York City, New York"
+    "Bacoor, Cavite", "Dasmariñas, Cavite", "Imus, Cavite", "Lopez, Quezon", "New York City, New York",
+    "Cavite City, Cavite", "General Trias, Cavite", "Tagaytay, Cavite", "Trece Martires, Cavite", "Kawit, Cavite", "Silang, Cavite",
+    "Manila, Metro Manila", "Quezon City, Metro Manila", "Makati, Metro Manila", "Pasig, Metro Manila", "Taguig, Metro Manila",
+    "Cebu City, Cebu", "Davao City, Davao del Sur", "Baguio, Benguet", "Iloilo City, Iloilo", "Cagayan de Oro, Misamis Oriental",
+    "Los Angeles, California", "Chicago, Illinois", "Tokyo, Japan", "Singapore, Singapore", "London, United Kingdom",
+    "Sydney, Australia", "Dubai, United Arab Emirates", "Hong Kong, Hong Kong",
 ]
 
 
