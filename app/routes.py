@@ -1,3 +1,14 @@
+import subprocess
+from app.services.add_product import setup_product_form, validate_category_location, save_product_submission
+from app.services.helper import time_ago, format_number
+from app.models import *
+from app.forms import *
+from app import app, db
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy import func
+import sqlalchemy as sa
+from flask import render_template, flash, redirect, url_for, request, session
+import urllib.request
 from datetime import datetime, timezone, timedelta, date, time as dtime
 from app.services.search import search_prices
 
@@ -5,24 +16,11 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-import urllib.request
-
-from flask import render_template, flash, redirect, url_for, request, session
-import sqlalchemy as sa
-
-from sqlalchemy import func
-from sqlalchemy.exc import SQLAlchemyError
-from app import app, db
-from app.forms import *
-from app.models import *
-from app.services.helper import time_ago, format_number
-from app.services.add_product import setup_product_form, validate_category_location, save_product_submission
-
-from sqlalchemy.exc import SQLAlchemyError
 
 # for perm website auto-update through /update route
-import subprocess
 
+
+@app.route("/", methods=["GET", "POST"])
 @app.route("/", methods=["GET", "POST"])
 def dashboard():
     # form = CompareForm()
@@ -83,7 +81,7 @@ def dashboard():
 
         stats=stats,
         activity=activity,
-        
+
         q=q,
         groups=groups,
     )         # form=form, # selected_products=selected_products,
@@ -137,13 +135,14 @@ def history():
     return render_template("history.html")
 
 
-
 @app.route("/compare", methods=["GET", "POST"])
 def compare():
     form = CompareForm()
 
-    products = db.session.scalars(db.select(Product).order_by(Product.name)).all()
-    form.products.choices = [(str(product.id), product.name)for product in products]
+    products = db.session.scalars(
+        db.select(Product).order_by(Product.name)).all()
+    form.products.choices = [(str(product.id), product.name)
+                             for product in products]
     chosen_listings_rows = []
 
     if form.validate_on_submit():
@@ -159,9 +158,9 @@ def compare():
         if len(selected_products) != len(set(product_ids)):
             raise ValueError("One or more selected products do not exist.")
 
-        #find the latest price for each listing
+        # find the latest price for each listing
         latest_prices = (db.select(PriceHistory.product_store_id, db.func.max(PriceHistory.id).label("latest_id"))
-            .group_by(PriceHistory.product_store_id) .subquery())
+                         .group_by(PriceHistory.product_store_id) .subquery())
 
         chosen_listings_rows = db.session.execute(
             db.select(ProductStore, Product, Store, PriceHistory)
@@ -235,28 +234,30 @@ def day_summary():
         })
     return render_template("day_summary.html", chosen=chosen, today=today, entries=entries)
 
+
 @app.route('/nukedb')
 def nuke_db():
-    
+
     db.drop_all()
     db.create_all()
-    
+
     return redirect('/')
+
 
 @app.route('/update')
 def deploy():
     pa_token = os.environ.get("PA_API_TOKEN")
-    
+
     result = subprocess.run(
-        ['git', 'pull'], 
+        ['git', 'pull'],
         cwd='/home/CommunityFoodPrice/foodprice',
-        capture_output=True, 
+        capture_output=True,
         text=True
     )
-    
+
     if result.returncode != 0:
         return f"there was an error running `git pull`. Error: {result.stderr}"
-        
+
     reload_url = f"https://www.pythonanywhere.com/api/v0/user/CommunityFoodPrice/webapps/CommunityFoodPrice.pythonanywhere.com/reload/"
     req = urllib.request.Request(reload_url, method='POST')
     req.add_header('Authorization', f'Token {pa_token}')

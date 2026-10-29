@@ -85,6 +85,7 @@
         <p>Pick a date and see that day's prices.</p>
       </a>
     </section>
+  </div>
 
   <!-- Right Column for Statistics -->
   <aside class="side-column">
@@ -103,8 +104,8 @@
       <ul class="feed">
         {% for item in activity | default([]) %}
         <li>
-          <b>{{ item.food }}</b> - ₱{{ item.price }} at {{
-          item.store }}, {{ item.location}}
+          <b>{{ item.food }}</b> - ₱{{ item.price }} at {{ item.store }}, {{
+          item.location}}
           <time>{{ item.time }}</time>
         </li>
         {% else %}
