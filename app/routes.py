@@ -14,7 +14,7 @@ from flask import render_template, flash, redirect, url_for, request, session
 import sqlalchemy as sa
 
 from sqlalchemy import func
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from app import app, db
 from app.forms import *
 from app.models import *
@@ -36,6 +36,9 @@ def require_login():
 @app.route("/login", methods=["GET", "POST"], endpoint="login")
 @app.route("/register", methods=["GET", "POST"], endpoint="register")
 def auth():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+
     mode = "register" if request.path == "/register" else "login"
     form = AuthForm()
 
@@ -44,8 +47,8 @@ def auth():
         user = db.session.scalar(db.select(User).where(func.lower(User.username) == username.lower()))
 
         if mode == "register":
-            if len(form.password.data) < 6:
-                form.password.errors.append("Use at least 6 characters.")
+            if len(form.password.data) < 8:
+                form.password.errors.append("Use at least 8 characters.")
             elif form.password.data != form.password2.data:
                 form.password2.errors.append("Password do not match.")
             elif user:
@@ -53,9 +56,14 @@ def auth():
             else:
                 user = User(username=username, password_hash=generate_password_hash(form.password.data))
                 db.session.add(user)
-                db.session.commit()
-                login_user(user)
-                return redirect(url_for("dashboard"))
+                try:
+                    db.session.commit()
+                except IntegrityError:
+                    db.session.rollback()
+                    form.username.errors.append("That username is taken. Please try again.")
+                else:
+                    login_user(user)
+                    return redirect(url_for("dashboard"))
         else:
             if user is None or not check_password_hash(user.password_hash, form.password.data):
                 flash("Wrong username or password.", "error")
@@ -66,10 +74,11 @@ def auth():
     return render_template("auth.html", form=form, mode=mode)
 
 
-@app.route("/logout")
+@app.route("/logout", methods=["POST"])
+@login_required
 def logout():
     logout_user()
-    return redirect(url_for("dashboard"))
+    return redirect(url_for("login"))
 
 @app.route("/", methods=["GET", "POST"])
 def dashboard():
@@ -119,6 +128,7 @@ def dashboard():
             "food": product.name,
             "price": format_number(history.price),
             "store": store.name,
+            "location": store.location,
             "time": time_ago(history.recorded_at),
         }
         for history, product, store, user in recent

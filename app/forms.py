@@ -18,7 +18,8 @@ LOCATIONS = [
 
 
 class AuthForm(FlaskForm):
-    username = StringField('Username', validators=[DataRequired(), Length(min=4, max=20)])
+    username = StringField('Username', filters=[lambda v: v.strip() if v else v], validators=[DataRequired(), Length(min=4, max=20)],
+)
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField('Repeat password', validators=[Optional()])
     submit = SubmitField('Continue')
