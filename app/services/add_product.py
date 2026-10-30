@@ -1,10 +1,10 @@
-
 import os
 from uuid import uuid4
 
 from werkzeug.utils import secure_filename
 from sqlalchemy import func
 
+from flask_login import current_user
 from app import app, db
 from app.models import Product, Store, ProductStore, PriceHistory
 
@@ -22,8 +22,7 @@ def validate_category_location(form):
 
 def setup_product_form(form):
     # populate store and product dropdowns.
-    stores = db.session.scalars(
-        db.select(Store).order_by(Store.name, Store.location)).all()
+    stores = db.session.scalars(db.select(Store).order_by(Store.name, Store.location)).all()
 
     form.store.choices = [
         ("", "Choose a store"), ("__new__", "Add a new store..."),
@@ -32,8 +31,7 @@ def setup_product_form(form):
             for s in stores
         ],]
 
-    products = db.session.scalars(
-        db.select(Product).order_by(Product.name)).all()
+    products = db.session.scalars(db.select(Product).order_by(Product.name)).all()
 
     form.product.choices = [
         ("", "Choose a product"), ("__new__", "Add a new product..."),
@@ -49,23 +47,16 @@ def get_or_create_store(form):
         store_name = (form.store_name.data or "").strip()
 
         if not store_name:
-            form.store_name.errors.append(
-                "Enter name for the new store."
-            )
+            form.store_name.errors.append("Enter name for the new store.")
             return None
 
-        store = db.session.scalar(
-            db.select(Store).where(
-                func.lower(Store.name) == store_name.lower(),
+        store = db.session.scalar(db.select(Store).where(func.lower(Store.name) == store_name.lower(),
                 Store.location == form.location.data,
             )
         )
 
         if store is None:
-            store = Store(
-                name=store_name,
-                location=form.location.data,
-            )
+            store = Store(name=store_name,location=form.location.data,)
             db.session.add(store)
             db.session.flush()
 
@@ -100,12 +91,10 @@ def get_or_create_product(form):
             )
             return None
 
-        product = db.session.scalar(db.select(Product).where(
-            func.lower(Product.name) == product_name.lower()))
+        product = db.session.scalar(db.select(Product).where(func.lower(Product.name) == product_name.lower()))
 
         if product is None:
-            product = Product(
-                name=product_name, description=form.description.data or None, category=form.category.data)
+            product = Product(name=product_name, description=form.description.data or None, category=form.category.data)
             db.session.add(product)
             db.session.flush()
 
@@ -147,17 +136,12 @@ def save_product_image(form, product):
 def get_or_create_listing(product, store, price):
     # check if product already exists for price history
     listing = db.session.scalar(
-        db.select(ProductStore).where(
-            ProductStore.product_id == product.id,
-            ProductStore.store_id == store.id,
+        db.select(ProductStore).where(ProductStore.product_id == product.id, ProductStore.store_id == store.id,
         )
     )
 
     if listing is None:
-        listing = ProductStore(
-            product=product,
-            store=store,
-            price=price,
+        listing = ProductStore(product=product, store=store, price=price,
         )
         db.session.add(listing)
         db.session.flush()
@@ -169,10 +153,7 @@ def get_or_create_listing(product, store, price):
 
 def record_price(listing, price):
     # record price
-    history = PriceHistory(
-        product_store=listing,
-        price=price,
-    )
+    history = PriceHistory(product_store=listing, price=price, user_id=current_user.id,)
     db.session.add(history)
 
 
@@ -187,7 +168,7 @@ def save_product_submission(form):
     save_product_image(form, product)
 
     price = form.total_price.data / form.quantity.data
-    listing = get_or_create_listing(product, store, price)
+    listing = get_or_create_listing(product, store, price,)
     record_price(listing, price)
 
     db.session.commit()
