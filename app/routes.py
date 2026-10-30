@@ -104,7 +104,7 @@ def dashboard():
         .join(Store, ProductStore.store_id == Store.id)
         .outerjoin(User, PriceHistory.user_id == User.id)
         .order_by(PriceHistory.recorded_at.desc())
-        .limit(5)
+        .limit(3)
     ).all()
 
     activity = [
@@ -209,13 +209,6 @@ def contributions():
     }
 
     return render_template("contributions.html", entries=entries, stats=stats)
-
-
-@app.route("/history")
-def history():
-    return render_template("history.html")
-
-
 
 # @app.route("/compare", methods=["GET", "POST"])
 # def compare():

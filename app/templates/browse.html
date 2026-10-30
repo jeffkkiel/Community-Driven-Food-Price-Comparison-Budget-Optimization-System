@@ -6,7 +6,7 @@ block head %}
   href="{{ url_for('static', filename='css/browse.css') }}"
 />
 {% endblock %} {% block content %}
-<main class="page">
+<main class="page browse-page">
   <div class="page-top">
     <a href="{{ url_for('dashboard') }}" class="back-link">
       <i class="fa-solid fa-arrow-left"></i> Back to dashboard
@@ -19,34 +19,45 @@ block head %}
   <h1>Browse Products</h1>
   <p>Browse the products</p>
 
-  <div class="choose-category">
-    <a href="{{ url_for('browse') }}" class="chip {{ 'active' if not category }}">All</a>
-    {% for c in categories %}
-    <a href="{{ url_for('browse', category=c) }}" class="chip {{ 'active' if c == category }}">{{ c }}</a>
-    {% endfor %}
-</div>
+  {% set icons = {"Fruits": "apple-whole", "Vegetables": "carrot", "Meat": "drumstick-bite", "Seafood": "fish", "Chilled": "snowflake", 
+  "Frozen": "icicles", "Snacks": "cookie-bite", "Sweets": "candy-cane", "Beverages": "mug-hot"} %}
 
-  <!-- dagdagan ng image pag di tinamad. dalawang version isang wala isang meron -->
-  {% if products %}
-  <div class="product-grid">
-    {% for prod in products %}
-    <a href="{{ url_for('product', product_id=prod.id) }}" class="product-card">
-      <span class="product-cat">{{ prod.category }}</span>
-      <h3>{{ prod.name }}</h3>
-      {% if prod.description %}
-      <p class="product-desc">{{ prod.description }}</p>
-      {% endif %}
-      <div class="product-foot">
-        <strong class="product-price">₱{{ "%.2f"|format(prod.price) }}</strong>
-        <span class="product-stores"
-          >{{ prod.stores }} store{{ "" if prod.stores == 1 else "s" }}</span
-        >
+  <div class="browse-layout">
+    <aside class="choose-category">
+      <a href="{{ url_for('browse') }}" class="chip {{ 'active' if not category }}">
+        <i class="fa-solid fa-layer-group"></i> All<span class="chip-check"><i class="fa-solid fa-check"></i></span>
+      </a>
+      {% for c in categories %}
+      <a href="{{ url_for('browse', category=c) }}" class="chip {{ 'active' if c == category }}">
+        <i class="fa-solid fa-{{ icons.get(c, 'tag') }}"></i> {{ c }}<span class="chip-check"><i class="fa-solid fa-check"></i></span>
+      </a>
+      {% endfor %}
+    </aside>
+
+    <!-- dagdagan ng image pag di tinamad. dalawang version isang wala isang meron -->
+    <div class="browse-products">
+      {% if products %}
+      <div class="product-grid">
+        {% for prod in products %}
+        <a
+          href="{{ url_for('product', product_id=prod.id) }}" class="product-card">
+          <span class="product-cat">{{ prod.category }}</span>
+          <h3>{{ prod.name }}</h3>
+          {% if prod.description %}
+          <p class="product-desc">{{ prod.description }}</p>
+          {% endif %}
+          <div class="product-foot">
+            <strong class="product-price">₱{{ "%.2f"|format(prod.price) }}</strong>
+            <span class="product-stores">{{ prod.stores }} store{{ "" if prod.stores == 1 else "s"}}</span>
+          </div>
+        </a>
+        {% endfor %}
+
       </div>
-    </a>
-    {% endfor %}
+      {% else %}
+      <p class="empty">No products currently logged.</p>
+      {% endif %}
+    </div>
   </div>
-  {% else %}
-  <p class="empty">No products currently logged.</p>
-  {% endif %}
-</main> 
+</main>
 {% endblock %}
