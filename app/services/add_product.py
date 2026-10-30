@@ -118,6 +118,19 @@ def save_product_image(form, product):
     image = form.img.data
 
     if not image or not image.filename:
+        category_images = {
+            "Fruits": "images/categories/fruits.png",
+            "Vegetables": "images/categories/vegetables.png",
+            "Meat": "images/categories/meat.png",
+            "Seafood": "images/categories/seafood.png",
+            "Chilled": "images/categories/chilled.png",
+            "Frozen": "images/categories/frozen.png",
+            "Snacks": "images/categories/snacks.png",
+            "Sweets": "images/categories/sweets.png",
+            "Beverages": "images/categories/beverages.png"
+        }
+
+        product.img_ref = category_images.get(form.category.data, "images/categories/default.png")
         return
 
     safe_name = secure_filename(image.filename)

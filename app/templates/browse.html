@@ -38,9 +38,8 @@ block head %}
       {% endif %}
       <div class="product-foot">
         <strong class="product-price">₱{{ "%.2f"|format(prod.price) }}</strong>
-        <span class="product-stores"
-          >{{ prod.stores }} store{{ "" if prod.stores == 1 else "s" }}</span
-        >
+        <span class="product-stores">
+          {{ prod.stores }} store{{ "" if prod.stores == 1 else "s" }}</span>
       </div>
     </a>
     {% endfor %}
