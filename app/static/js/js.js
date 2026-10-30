@@ -18,3 +18,16 @@ function updateHero() {
 
 updateHero();                      
 setInterval(updateHero, 60 * 1000); 
+
+// auth html
+const authCard = document.getElementById("auth-card");
+const swapLink = document.querySelector("[data-swap]");
+
+if (authCard && swapLink) {
+  swapLink.addEventListener("click", (e) => {
+    e.preventDefault();
+    authCard.classList.toggle("register");
+    authCard.classList.add("leaving");
+    setTimeout(() => (window.location = swapLink.href), 500);
+  });
+}
