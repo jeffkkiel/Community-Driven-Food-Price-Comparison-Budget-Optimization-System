@@ -23,13 +23,22 @@ head %}
         <p>{{ store.location }}</p>
 
         <h4>Price History</h4>
-
-        {% for price in store.prices %}
-            <div class="price-entry">
-                <span>₱{{ price.price }}</span>
-                <span>{{ price.recorded_at }}</span>
-            </div>
-        {% endfor %}
+        <table class="price-history-table">
+            <thead>
+                <tr>
+                    <th>Price</th>
+                    <th>History</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for price in store.prices %}
+                    <tr>
+                        <td>₱{{ "%.2f"|format(price.price) }}</td>
+                        <td>{{ price.recorded_at.strftime('%B %d, %Y %I:%M %p') }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
     </div>
     {% endfor %}
