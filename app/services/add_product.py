@@ -127,9 +127,13 @@ def save_product_image(form, product):
             "Frozen": "images/categories/frozen.png",
             "Snacks": "images/categories/snacks.png",
             "Sweets": "images/categories/sweets.png",
-            "Beverages": "images/categories/beverages.png"
+            "Beverages": "images/categories/beverages.png",
+            "Rice & Grains": "images/categories/rice_grains.png",
+            "Canned Goods": "images/categories/canned_goods.png",
+            "Condiments": "images/categories/condiments.png",
+            "Household": "images/categories/household.png",
+            "Bakery": "images/categories/bakery.png",
         }
-
         product.img_ref = category_images.get(form.category.data, "images/categories/default.png")
         return
 

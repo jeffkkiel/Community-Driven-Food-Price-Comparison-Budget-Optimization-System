@@ -358,7 +358,8 @@ def browse():
             "category": product.category,
             "description": product.description,
             "price": price,
-            "stores": store_count
+            "stores": store_count,
+            "img": product.img_ref
         })
     
     return render_template("browse.html", products=products, categories=CATEGORIES, category=category)

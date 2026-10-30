@@ -1,8 +1,7 @@
 from flask_login import UserMixin
 from flask_wtf import FlaskForm
 from wtforms import *
-from wtforms.widgets import ListWidget, CheckboxInput
-from wtforms.validators import DataRequired, Optional, NumberRange, Length, ValidationError, EqualTo
+from wtforms.validators import DataRequired, Optional, NumberRange, Length, ValidationError
 
 CATEGORIES = [
     "Fruits", "Vegetables", "Meat", "Seafood", "Chilled", "Frozen", "Snacks", "Sweets", "Beverages",
@@ -38,12 +37,6 @@ class ProductForm(FlaskForm):
     quantity = IntegerField('Product Quantity', default=1, validators=[DataRequired(), NumberRange(min=1)])
     total_price = DecimalField('Total Price (₱)', places=2, validators=[DataRequired(), NumberRange(min=0)])
     submit = SubmitField('Add Product')
-
-
-# class CompareForm(FlaskForm):
-#     products = SelectMultipleField('Add a food to compare',choices=[], option_widget=CheckboxInput(),
-#                                    widget=ListWidget(prefix_label=False))
-#     submit = SubmitField('Add')
 
 
 class OptimizeForm(FlaskForm):

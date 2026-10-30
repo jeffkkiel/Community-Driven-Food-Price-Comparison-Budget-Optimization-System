@@ -40,11 +40,16 @@ block head %}
       <div class="product-grid">
         {% for prod in products %}
         <a href="{{ url_for('product', product_id=prod.id) }}" class="product-card">
-          <span class="product-cat">{{ prod.category }}</span>
-          <h3>{{ prod.name }}</h3>
-          {% if prod.description %}
-          <p class="product-desc">{{ prod.description }}</p>
-          {% endif %}
+          <div class="product-upper">
+            <div class="product-info">
+              <span class="product-cat">{{ prod.category }}</span>
+              <h3>{{ prod.name }}</h3>
+              {% if prod.description %}
+              <p class="product-desc">{{ prod.description }}</p>
+              {% endif %}
+            </div>
+            <img src="{{ url_for('static', filename=prod.img) }}" alt="{{ prod.category }} Default Image" class="product-image">
+          </div>
           <div class="product-foot">
             <strong class="product-price">₱{{ "%.2f"|format(prod.price) }}</strong>
             <span class="product-stores">{{ prod.stores }} store{{ "" if prod.stores == 1 else "s"}}</span>

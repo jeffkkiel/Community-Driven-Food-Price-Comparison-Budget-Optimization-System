@@ -45,6 +45,25 @@
     overflow: hidden;
 }
 
+.product-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.product-upper {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px
+}
+
+.prod_image {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+
 .product-foot {
     display: flex;
     align-items: baseline;
