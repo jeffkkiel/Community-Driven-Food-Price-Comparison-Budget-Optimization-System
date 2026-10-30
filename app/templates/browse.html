@@ -1,51 +1,52 @@
-{% extends "base.html" %} {% block title %}Browse Products{% endblock %} {% block
-head %}
+{% extends "base.html" %} {% block title %}Browse Products{% endblock %} {%
+block head %}
 
-<!-- make own css -->
 <link
   rel="stylesheet"
-  href="{{ url_for('static', filename='css/dashboard.css') }}"
+  href="{{ url_for('static', filename='css/browse.css') }}"
 />
 {% endblock %} {% block content %}
 <main class="page">
-  <a href="{{ url_for('dashboard') }}" class="back-link">
-    <i class="fa-solid fa-arrow-left"></i> Back to dashboard
-  </a>
+  <div class="page-top">
+    <a href="{{ url_for('dashboard') }}" class="back-link">
+      <i class="fa-solid fa-arrow-left"></i> Back to dashboard
+    </a>
+    <a href="{{ url_for('add_product') }}" class="top-btn top-btn-solid">
+      <i class="fa-solid fa-plus"></i> Add price
+    </a>
+  </div>
 
   <h1>Browse Products</h1>
-  <p>
-    Browse the products
-  </p>
+  <p>Browse the products</p>
+
+  <div class="choose-category">
+    <a href="{{ url_for('browse') }}" class="chip {{ 'active' if not category }}">All</a>
+    {% for c in categories %}
+    <a href="{{ url_for('browse', category=c) }}" class="chip {{ 'active' if c == category }}">{{ c }}</a>
+    {% endfor %}
+</div>
+
   <!-- dagdagan ng image pag di tinamad. dalawang version isang wala isang meron -->
   {% if products %}
+  <div class="product-grid">
     {% for prod in products %}
-    <a href="{{ url_for('product', product_id=prod.id) }}">
-      <div class="card">
-        <div class="desc">
-          <h3>{{ prod.name }}</h3>
-          <p>{{ prod.category }}</p>
-          <p>{{ prod.description }}</p>
-        </div>
-        <p>Latest Price: ₱{{ prod.price }}</p>
-        <p>Available in {{ prod.stores }} Stores</p>
+    <a href="{{ url_for('product', product_id=prod.id) }}" class="product-card">
+      <span class="product-cat">{{ prod.category }}</span>
+      <h3>{{ prod.name }}</h3>
+      {% if prod.description %}
+      <p class="product-desc">{{ prod.description }}</p>
+      {% endif %}
+      <div class="product-foot">
+        <strong class="product-price">₱{{ "%.2f"|format(prod.price) }}</strong>
+        <span class="product-stores"
+          >{{ prod.stores }} store{{ "" if prod.stores == 1 else "s" }}</span
+        >
       </div>
     </a>
     {% endfor %}
+  </div>
   {% else %}
   <p class="empty">No products currently logged.</p>
   {% endif %}
-
-  <aside class="side-column">
-    <div class="panel panel-dark">
-      <section class="big-cards">
-        <a href="{{ url_for('add_product') }}" class="card card-big">
-          <i class="fa-solid fa-plus"></i>
-          <h2>Add Price</h2>
-          <p>Saw a price at your store? Share it with the community.</p>
-        </a>
-      </section>
-    </div>
-  </aside>
-</main>
-
+</main> 
 {% endblock %}

@@ -1,3 +1,11 @@
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/contributions.css') }}"
+/>
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/day_summary.css') }}"
+/>
 {% extends "base.html" %} {% block title %}My Contributions{% endblock %} {%
 block content %}
 
@@ -7,38 +15,76 @@ block content %}
   </a>
 
   <h1>My Contributions</h1>
-  <p>
-    {{ current_user.username }} has submitted {{ entries|length }} price {{ ""if entries|length == 1 else "s"}}
-  </p>
+  <p>Every price you have shared with the community.</p>
 
   {% if entries%}
-  <div class="table-wrap">
-    <table class="table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Food</th>
-          <th>Category</th>
-          <th>Store</th>
-          <th>Price (per unit)</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for e in entries %}
-        <tr>
-          <td>{{ e.date }}</td>
-          <td>{{ e.food }}</td>
-          <td>{{ e.category }}</td>
-          <td>{{ e.store }}</td>
-          <td>{{ "%.2f"|format(e.price) }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+  <section class="contrib-banner">
+    <div class="contrib-text">
+      <h2>Congratulations, {{ current_user.username }}!</h2>
+      <p>You have helped the community. Keep it up!</p>
+    </div>
+
+    <div class="contrib-stats">
+      <div>
+        <i class="fa-solid fa-tag"></i>
+        <strong>{{ stats.prices }}</strong>
+        <span>Prices</span>
+      </div>
+      <div>
+        <i class="fa-solid fa-apple-whole"></i>
+        <strong>{{ stats.foods }}</strong>
+        <span>Foods</span>
+      </div>
+      <div>
+        <i class="fa-solid fa-store"></i>
+        <strong>{{ stats.stores }}</strong>
+        <span>Stores</span>
+      </div>
+      <div>
+        <i class="fa-solid fa-location-dot"></i>
+        <strong>{{ stats.locations }}</strong>
+        <span>Locations</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="summary">
+    <h2>Your price reports</h2>
+    <p class="count">
+      {{ entries|length }} price report{{ "" if entries|length == 1 else "s" }}
+    </p>
+
+    <div class="table-container">
+      <table class="content-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Food</th>
+            <th>Category</th>
+            <th>Store</th>
+            <th>Location</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for e in entries %}
+          <tr>
+            <td>{{ e.date }}</td>
+            <td>{{ e.food }}</td>
+            <td>{{ e.category }}</td>
+            <td>{{ e.store }}</td>
+            <td>{{ e.locaion }}</td>
+            <td class="num">{{ "%.2f"|format(e.price) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
   {% else %}
-  <p class="empty">You haven't added any prices yet</p>
-  <a href="{{ url_for('add_product') }}">Add your first price</a>. {% endif %}
+  <p class="empty">You haven't added any prices yet.</p>
+  <p class="empty"><a href="{{ url_for('add_product') }}">Add your first price</a></p>
+  {% endif %}  
 </main>
 
 {% endblock %}

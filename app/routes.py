@@ -193,7 +193,7 @@ def contributions():
             recorded = recorded.replace(tzinfo=timezone.utc)
     
         entries.append({
-            "time": recorded.astimezone(manila).strftime("%I:%M %p"),
+            "date": recorded.astimezone(manila).strftime("%b %d, %Y %I:%M %p"),
             "food": product.name,
             "category": product.category,
             "store": store.name,
@@ -201,7 +201,14 @@ def contributions():
             "price": history.price
         })
 
-    return render_template("contributions.html", entries=entries)
+    stats = {
+        "prices": len(entries),
+        "foods": len({e["food"] for e in entries}),
+        "stores": len({(e["store"], e["location"]) for e in entries}),
+        "locations": len({e["location"] for e in entries}),
+    }
+
+    return render_template("contributions.html", entries=entries, stats=stats)
 
 
 @app.route("/history")
@@ -271,13 +278,20 @@ def browse():
         .join(latest_prices, latest_prices.c.latest_id == PriceHistory.id)
         .subquery()
     )
-    rows = db.session.execute(
+
+    category = request.args.get("category", "")
+
+    query = (
         db.select(Product, product_prices.c.price, store_counts.c.store_count)
         .join(product_prices, product_prices.c.product_id == Product.id)
         .join(store_counts, store_counts.c.product_id == Product.id)
         .where(product_prices.c.rank == 1)
-        .order_by(Product.name)
-    ).all()
+    )
+
+    if category in CATEGORIES:
+        query = query.where(Product.category == category)
+
+    rows = db.session.execute(query.order_by(Product.name)).all()
 
     products = []
 
@@ -291,7 +305,7 @@ def browse():
             "stores": store_count
         })
     
-    return render_template("browse.html", products=products)
+    return render_template("browse.html", products=products, categories=CATEGORIES, category=category)
 
 @app.route("/product/<int:product_id>")
 def product(product_id):
