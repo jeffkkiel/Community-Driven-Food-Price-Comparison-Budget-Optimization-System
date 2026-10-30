@@ -1,6 +1,7 @@
 from flask_login import UserMixin
 from flask_wtf import FlaskForm
 from wtforms import *
+from wtforms.widgets import ListWidget, CheckboxInput
 from wtforms.validators import DataRequired, Optional, NumberRange, Length, ValidationError, EqualTo
 
 CATEGORIES = [
@@ -38,6 +39,7 @@ class ProductForm(FlaskForm):
     submit = SubmitField('Add Product')
 
 
-class CompareForm(FlaskForm):
-    products = SelectMultipleField('Add a food to compare',choices=[], validators=[DataRequired()])
-    submit = SubmitField('Add')
+# class CompareForm(FlaskForm):
+#     products = SelectMultipleField('Add a food to compare',choices=[], option_widget=CheckboxInput(),
+#                                    widget=ListWidget(prefix_label=False))
+#     submit = SubmitField('Add')

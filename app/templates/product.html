@@ -1,0 +1,38 @@
+{% extends "base.html" %} {% block title %} {{ product.name }} {% endblock %} {% block
+head %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/history.css') }}"
+/>
+{% endblock %} {% block content %}
+ <!-- Back link -->
+  <a href="{{ url_for('browse') }}" class="back-link">
+    <i class="fa-solid fa-arrow-left"></i> Browse Products
+  </a>
+
+<main class="page">
+  <h1>{{ product.name }}</h1>
+  <h3>{{ product.category }}</h3>
+  <p>Description<br>{{ product.description }}</p>
+
+  <h3>Stores: </h3>
+  {% for store_id, store in stores.items() %}
+    <div class="store-card">
+
+        <h3>{{ store.name }}</h3>
+        <p>{{ store.location }}</p>
+
+        <h4>Price History</h4>
+
+        {% for price in store.prices %}
+            <div class="price-entry">
+                <span>₱{{ price.price }}</span>
+                <span>{{ price.recorded_at }}</span>
+            </div>
+        {% endfor %}
+
+    </div>
+    {% endfor %}
+</main>
+
+{% endblock %}
