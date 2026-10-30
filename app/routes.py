@@ -1,4 +1,13 @@
 from datetime import datetime, timezone, timedelta, date, time as dtime
+from decimal import Decimal, InvalidOperation
+
+from app.services.optimize import (
+    calculate_plan,
+    get_location_products,
+    get_location_stores,
+    get_locations,
+    get_product_categories,
+)
 from app.services.search import search_prices
 
 from flask_login import current_user, login_user, logout_user, login_required
@@ -166,9 +175,109 @@ def add_product():
     return render_template("add_product.html", form=form)
 
 
-@app.route("/optimize")
+@app.route("/optimize", methods=["GET", "POST"])
 def optimize():
-    return render_template("optimize.html")
+    locations = get_locations()
+    form = OptimizeForm()
+    form.location.choices = [("", "Choose a location")] + [
+        (location, location) for location in locations
+    ]
+
+    if request.method == "POST" and request.form.get("step") == "calculate":
+        location = request.form.get("location", "")
+        budget_raw = request.form.get("budget", "")
+
+        if location not in locations:
+            flash("Please choose a valid location.", "error")
+            return redirect(url_for("optimize"))
+
+        try:
+            budget = Decimal(budget_raw)
+            if not budget.is_finite() or budget < 0:
+                raise ValueError
+            budget = budget.quantize(Decimal("0.01"))
+        except (InvalidOperation, ValueError):
+            flash("Enter a valid budget.", "error")
+            return redirect(url_for("optimize"))
+
+        products = get_location_products(location)
+        stores = get_location_stores(location)
+        product_ids = {row["product"].id for row in products}
+
+        raw_quantities = {
+            product_id: (request.form.get(f"qty_{product_id}", "0").strip() or "0")
+            for product_id in product_ids
+        }
+        quantities = {}
+
+        context = {
+            "step": "basket",
+            "form": form,
+            "location": location,
+            "budget": budget,
+            "products": products,
+            "stores": stores,
+            "categories": get_product_categories(products),
+            "quantities": raw_quantities,
+            "plan": None,
+        }
+
+        for product_id, raw in raw_quantities.items():
+            try:
+                quantity = int(raw)
+            except ValueError:
+                flash("Quantities must be whole numbers.", "error")
+                return render_template("optimize.html", **context)
+
+            if quantity < 0:
+                flash("Quantities cannot be negative.", "error")
+                return render_template("optimize.html", **context)
+
+            if quantity > 9999:
+                flash("Quantities must be 9999 or less.", "error")
+                return render_template("optimize.html", **context)
+
+            if quantity > 0:
+                quantities[product_id] = quantity
+
+        if not quantities:
+            flash("Enter a quantity for at least one food.", "error")
+            return render_template("optimize.html", **context)
+
+        context["quantities"] = quantities
+        context["plan"] = calculate_plan(location, budget, quantities)
+        return render_template("optimize.html", **context)
+
+    if form.validate_on_submit():
+        location = form.location.data
+
+        try:
+            budget = form.budget.data.quantize(Decimal("0.01"))
+        except (InvalidOperation, AttributeError):
+            flash("Enter a valid budget.", "error")
+            return redirect(url_for("optimize"))
+
+        products = get_location_products(location)
+
+        return render_template(
+            "optimize.html",
+            step="basket",
+            form=form,
+            location=location,
+            budget=budget,
+            products=products,
+            stores=get_location_stores(location),
+            categories=get_product_categories(products),
+            quantities={},
+            plan=None,
+        )
+
+    return render_template(
+        "optimize.html",
+        step="setup",
+        form=form,
+        locations=locations,
+    )
 
 
 @app.route("/contributions")

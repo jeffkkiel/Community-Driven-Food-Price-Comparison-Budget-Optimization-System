@@ -1,12 +1,274 @@
 {% extends "base.html" %} {% block title %}Optimize Budget{% endblock %} {%
-block content %}
+block head %}
 
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/browse.css') }}"
+/>
+{% endblock %} {% block content %}
+
+{% if step == "setup" %}
 <main class="page">
-  <a href="{{ url_for('dashboard') }}" class="back-link">
-    <i class="fa-solid fa-arrow-left"></i> Back to dashboard
-  </a>
+  <div class="page-top">
+    <a href="{{ url_for('dashboard') }}" class="back-link">
+      <i class="fa-solid fa-arrow-left"></i> Back to dashboard
+    </a>
+  </div>
 
   <h1>Optimize Budget</h1>
+
+  {% if locations %}
+  <form class="setup-card" method="POST" action="{{ url_for('optimize') }}">
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+      {{ form.location.label }}
+      {{ form.location() }}
+      {% for error in form.location.errors %}
+        <span class="error">{{ error }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="form-group">
+      {{ form.budget.label }}
+      {{ form.budget(min="0", step="0.01", placeholder="e.g. 1000.00") }}
+      {% for error in form.budget.errors %}
+        <span class="error">{{ error }}</span>
+      {% endfor %}
+    </div>
+
+    {{ form.submit(class="btn") }}
+  </form>
+  {% else %}
+  <p class="empty">No prices are stored yet.</p>
+  {% endif %}
 </main>
 
+{% else %}
+<main class="page page-wide">
+  <div class="page-top">
+    <a href="{{ url_for('dashboard') }}" class="back-link">
+      <i class="fa-solid fa-arrow-left"></i> Back to dashboard
+    </a>
+    <a href="{{ url_for('optimize') }}" class="top-btn">
+      Change data
+    </a>
+  </div>
+
+  <h1>Optimize Budget</h1>
+  <p class="opt-meta">
+    <span>{{ location }}</span>
+    <span>Budget ₱{{ "%.2f"|format(budget) }}</span>
+  </p>
+  {% if stores %}
+  <p class="opt-compare">Comparing: {{ stores|join(", ") }}</p>
+  {% endif %}
+
+  {% if products %}
+  {% set ns = namespace(products=0, units=0) %}
+  {% for row in products %}
+    {% set current_quantity = quantities.get(row.product.id, 0)|int %}
+    {% if current_quantity > 0 %}
+      {% set ns.products = ns.products + 1 %}
+      {% set ns.units = ns.units + current_quantity %}
+    {% endif %}
+  {% endfor %}
+  <form method="POST" action="{{ url_for('optimize') }}">
+    {{ form.hidden_tag() }}
+    <input type="hidden" name="step" value="calculate" />
+    <input type="hidden" name="location" value="{{ location }}" />
+    <input type="hidden" name="budget" value="{{ '%.2f'|format(budget) }}" />
+
+    <div class="choose-category basket-chips">
+      <button type="button" class="chip active" data-category="" aria-pressed="true">All</button>
+      {% for category in categories %}
+      <button type="button" class="chip" data-category="{{ category }}" aria-pressed="false">{{ category }}</button>
+      {% endfor %}
+    </div>
+
+    <div class="product-grid" id="basket-grid">
+      {% for row in products %}
+      {% set quantity = quantities.get(row.product.id, 0)|int %}
+      <div
+        class="product-card basket-card{{ ' selected' if quantity > 0 }}"
+        data-category="{{ row.product.category }}"
+      >
+        <span class="product-cat">{{ row.product.category }}</span>
+        <h3>{{ row.product.name }}</h3>
+        {% if row.product.description %}
+        <p class="product-desc">{{ row.product.description }}</p>
+        {% endif %}
+        <div class="product-foot">
+          <strong class="product-price">₱{{ "%.2f"|format(row.price) }}</strong>
+          <span class="product-stores">{{ row.store.name }}</span>
+        </div>
+        <div class="qty-stepper">
+          <button
+            type="button"
+            class="qty-btn"
+            data-step="-1"
+            aria-label="Decrease quantity for {{ row.product.name }}"
+          >−</button>
+          <input
+            type="text"
+            class="qty-input"
+            name="qty_{{ row.product.id }}"
+            value="{{ quantity }}"
+            inputmode="none"
+            readonly
+            aria-label="Quantity for {{ row.product.name }}"
+          />
+          <button
+            type="button"
+            class="qty-btn"
+            data-step="1"
+            aria-label="Increase quantity for {{ row.product.name }}"
+          >+</button>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <div class="basket-actions">
+      <p id="basket-count" aria-live="polite">
+        {% if ns.products %}
+          {{ ns.products }} item{{ "" if ns.products == 1 else "s" }}
+          · {{ ns.units }} unit{{ "" if ns.units == 1 else "s" }} selected
+        {% else %}
+          No items selected
+        {% endif %}
+      </p>
+      <button type="submit" class="btn">Calculate plan</button>
+    </div>
+  </form>
+
+  {% if plan %}
+  <section class="results" id="results">
+    <div class="plan-summary">
+      <div>
+        <span class="summary-label">Best mix total</span>
+        <strong class="summary-total">₱{{ "%.2f"|format(plan.total) }}</strong>
+        {% set total_units = plan.lines|sum(attribute="quantity") %}
+        {% set store_count = plan.lines|map(attribute="store.name")|unique|list|length %}
+        <span class="summary-sub">
+          {{ total_units }} item{{ "" if total_units == 1 else "s" }}
+          from {{ store_count }} store{{ "" if store_count == 1 else "s" }}
+        </span>
+      </div>
+
+      <div class="summary-stats">
+        <div class="summary-stat">
+          <span>Budget</span>
+          <strong>₱{{ "%.2f"|format(plan.budget) }}</strong>
+        </div>
+        <div class="summary-stat">
+          <span>
+            {% if plan.remaining > 0 %}Within budget
+            {% elif plan.remaining == 0 %}On budget
+            {% else %}Over budget{% endif %}
+          </span>
+          <strong class="{{ 'good' if plan.remaining >= 0 else 'bad' }}">
+            ₱{{ "%.2f"|format(plan.remaining if plan.remaining >= 0 else -plan.remaining) }}
+          </strong>
+        </div>
+        <div class="summary-stat">
+          <span>Savings</span>
+          <strong class="{{ 'good' if plan.savings and plan.savings > 0 }}">
+            {% if plan.cheapest_store %}
+              ₱{{ "%.2f"|format(plan.savings) }}
+            {% else %}
+              —
+            {% endif %}
+          </strong>
+        </div>
+      </div>
+    </div>
+
+    {% if plan.cheapest_store %}
+      {% if plan.savings > 0 %}
+      <p class="plan-note">
+        The best mix saves <strong>₱{{ "%.2f"|format(plan.savings) }}</strong>
+        compared with {{ plan.cheapest_store.store.name }}, the cheapest store
+        that has every item.
+      </p>
+      {% else %}
+      <p class="plan-note">
+        {{ plan.cheapest_store.store.name }} is the cheapest store that has
+        every item and matches the best mix.
+      </p>
+      {% endif %}
+    {% else %}
+    <p class="plan-note">
+      No single store has every selected item, so the best mix is the only
+      complete option.
+    </p>
+    {% endif %}
+
+    {% if plan.missing %}
+    <p class="plan-note">
+      No price found in this area for {{ plan.missing|join(", ") }}. These items
+      are not included in the total.
+    </p>
+    {% endif %}
+
+    <h2>Store breakdown</h2>
+
+    <div class="store-list">
+      {% for row in plan.store_totals %}
+      {% set is_best_store = plan.cheapest_store and row.store.id == plan.cheapest_store.store.id %}
+      <article class="store-card plan-store{{ ' is-best' if is_best_store }}">
+        <div class="store-head">
+          <div>
+            <h3>{{ row.store.name }}</h3>
+            <span class="store-sub">
+              {{ row.covered }} of {{ row.needed }} items priced{% if not row.complete %} · partial total{% endif %}
+            </span>
+          </div>
+          <div class="store-total-wrap">
+            {% if is_best_store %}
+            <span class="store-badge best">Cheapest complete</span>
+            {% elif row.complete %}
+            <span class="store-badge complete">Complete</span>
+            {% else %}
+            <span class="store-badge partial">{{ row.missing|length }} missing</span>
+            {% endif %}
+            <strong class="store-total">₱{{ "%.2f"|format(row.total) }}</strong>
+          </div>
+        </div>
+
+        <div class="store-lines">
+          {% for line in row.lines %}
+          <div class="store-line">
+            <span class="line-name">
+              {{ line.product.name }}
+              {% if line.is_best %}<span class="badge-best">Best price</span>{% endif %}
+            </span>
+            <span class="line-meta">
+              <span class="line-qty">{{ line.quantity }} × ₱{{ "%.2f"|format(line.unit_price) }}</span>
+              <strong class="line-total">₱{{ "%.2f"|format(line.subtotal) }}</strong>
+            </span>
+          </div>
+          {% endfor %}
+        </div>
+
+        {% if row.missing %}
+        <div class="store-missing">
+          <span class="missing-label">Missing</span>
+          {% for name in row.missing %}
+          <span class="missing-chip">{{ name }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+  {% else %}
+  <p class="empty">No products with prices in this area.</p>
+  {% endif %}
+</main>
+{% endif %}
+
+<script src="{{ url_for('static', filename='js/optimize.js') }}"></script>
 {% endblock %}
