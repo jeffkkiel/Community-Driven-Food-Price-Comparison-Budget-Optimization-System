@@ -1,0 +1,44 @@
+{% extends "base.html" %} 
+{% block tittle %} {{ "Register" if mode == "register" else "Log in"}} {% endblock %}
+{% block head %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/add_product.css') }}"
+/>
+{% endblock %} {% block content %}
+
+<main class="page">
+  <h1>{{ "Create account" if mode == "register" else "Log in"}}</h1>
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+      {{ form.username.label }} {{ form.username() }}
+      {% for e in form.username.errors %} <span class="error">{{ e }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="form-group">
+      {{ form.password.label }} {{ form.password() }}
+      {% for e in form.password.errors %} <span class="error">{{ e }}</span>
+      {% endfor %}
+    </div>
+
+    {% if mode == "register" %}
+    <div class="form-group">
+      {{ form.password2.label }} {{ form.password2() }}
+      {% for e in form.password2.errors %} <span class="error">{{ e }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+    
+    {{ form.submit(class="btn btn-primary") }}
+  </form>
+
+  {% if mode == "register" %}
+  <p>Already have an account? <a href="{{ url_for('login') }}">Log in</a></p>
+  {% else %}
+  <p>No account? <a href="{{ url_for('register') }}">Register</a></p>
+  {% endif %}
+</main>
+{% endblock %}  

@@ -4,10 +4,7 @@ from decimal import Decimal
 from datetime import datetime, timezone
 import sqlalchemy as sa
 import sqlalchemy.orm as so
-from app import db
-
-# for login
-
+from app import db, login
 
 class User(UserMixin, db.Model):
     __tablename__ = "users"
@@ -86,24 +83,22 @@ class ProductStore(db.Model):
 # Stores historical prices for each product-store listing.
 class PriceHistory(db.Model):
     __tablename__ = "price_history"
-    user_id: so.Mapped[int | None] = so.mapped_column(
-        sa.ForeignKey("users.id"), index=True, nullable=True)
-
     id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    user_id: so.Mapped[int | None] = so.mapped_column(sa.ForeignKey("users.id"), index=True, nullable=True)
 
-    product_store_id: so.Mapped[int] = so.mapped_column(
-        sa.ForeignKey("product_stores.id"), index=True, nullable=False)
-    price: so.Mapped[Decimal] = so.mapped_column(
-        sa.Numeric(10, 2), nullable=False)
-    recorded_at: so.Mapped[datetime] = so.mapped_column(
-        sa.DateTime(timezone=True),
+    product_store_id: so.Mapped[int] = so.mapped_column(sa.ForeignKey("product_stores.id"), index=True, nullable=False)
+    price: so.Mapped[Decimal] = so.mapped_column(sa.Numeric(10, 2), nullable=False)
+    recorded_at: so.Mapped[datetime] = so.mapped_column(sa.DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
         index=True,
         nullable=False
     )
 
-    product_store: so.Mapped["ProductStore"] = so.relationship(
-        back_populates="price_history")
+    product_store: so.Mapped["ProductStore"] = so.relationship(back_populates="price_history")
 
     def __repr__(self):
         return f"<PriceHistory {self.price} - {self.recorded_at}>"
+
+@login.user_loader
+def load_user(user_id):
+    return db.session.get(User, int(user_id))

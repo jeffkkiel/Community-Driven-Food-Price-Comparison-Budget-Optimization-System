@@ -25,6 +25,7 @@
         </div>
       </a>
 
+      {% if current_user.is_authenticated %}
       <form class="search-bar" action="{{ url_for('dashboard') }}" method="get">
         <input
           type="search"
@@ -37,6 +38,25 @@
           <i class="fa-solid fa-magnifying-glass"></i>
         </button>
       </form>
+
+      <div class="nav-actions">
+        <span class="nav-user">
+          <i class="fa-solid fa-user"></i>
+          <span class="nav-user-name">{{ current_user.username }}</span>
+        </span>
+        <form method="POST" action="{{ url_for('logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <button type="submit" class="nav-btn">
+            <i class="fa-solid fa-right-from-bracket"></i> Log out
+          </button>
+        </form>
+      </div>
+    {% else %}
+      <nav class="nav-actions">
+        <a href="{{ url_for('login') }}" class="nav-btn">Log in</a>
+        <a href="{{ url_for('register') }}" class="nav-btn nav-btn-solid">Register</a>
+      </nav>
+      {% endif %}
     </header>
 
     {% with messages = get_flashed_messages(with_categories=true) %} {% if

@@ -1,26 +1,85 @@
-import subprocess
-from app.services.add_product import setup_product_form, validate_category_location, save_product_submission
-from app.services.helper import time_ago, format_number
-from app.models import *
-from app.forms import *
-from app import app, db
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import func
-import sqlalchemy as sa
-from flask import render_template, flash, redirect, url_for, request, session
-import urllib.request
 from datetime import datetime, timezone, timedelta, date, time as dtime
 from app.services.search import search_prices
+
+from flask_login import current_user, login_user, logout_user, login_required
+from werkzeug.security import generate_password_hash, check_password_hash
 
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
+import urllib.request
+
+from flask import render_template, flash, redirect, url_for, request, session
+import sqlalchemy as sa
+
+from sqlalchemy import func
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from app import app, db
+from app.forms import *
+from app.models import *
+from app.services.helper import time_ago, format_number
+from app.services.add_product import setup_product_form, validate_category_location, save_product_submission
+
+from sqlalchemy.exc import SQLAlchemyError
 
 # for perm website auto-update through /update route
+import subprocess
+
+@app.before_request
+def require_login():
+    allowed = ("login", "register", "static")
+    if not current_user.is_authenticated and request.endpoint not in allowed:
+        return redirect(url_for("login"))
+    
+
+@app.route("/login", methods=["GET", "POST"], endpoint="login")
+@app.route("/register", methods=["GET", "POST"], endpoint="register")
+def auth():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+
+    mode = "register" if request.path == "/register" else "login"
+    form = AuthForm()
+
+    if form.validate_on_submit():
+        username = form.username.data.strip()
+        user = db.session.scalar(db.select(User).where(func.lower(User.username) == username.lower()))
+
+        if mode == "register":
+            if len(form.password.data) < 8:
+                form.password.errors.append("Use at least 8 characters.")
+            elif form.password.data != form.password2.data:
+                form.password2.errors.append("Password do not match.")
+            elif user:
+                form.username.errors.append("That username is taken. Please try again.")
+            else:
+                user = User(username=username, password_hash=generate_password_hash(form.password.data))
+                db.session.add(user)
+                try:
+                    db.session.commit()
+                except IntegrityError:
+                    db.session.rollback()
+                    form.username.errors.append("That username is taken. Please try again.")
+                else:
+                    login_user(user)
+                    return redirect(url_for("dashboard"))
+        else:
+            if user is None or not check_password_hash(user.password_hash, form.password.data):
+                flash("Wrong username or password.", "error")
+            else:
+                login_user(user)
+                return redirect(url_for("dashboard"))
+
+    return render_template("auth.html", form=form, mode=mode)
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/logout", methods=["POST"])
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("login"))
+
 @app.route("/", methods=["GET", "POST"])
 def dashboard():
     # form = CompareForm()
@@ -49,28 +108,30 @@ def dashboard():
     stats = {
         "stores": db.session.scalar(db.select(func.count(Store.id))),
         "foods": db.session.scalar(db.select(func.count(Product.id))),
-        "locations": db.session.scalar(db.select(func.count(func.distinct(Store.location)))),
+        "users": db.session.scalar(db.select(func.count(User.id))),
         "today": db.session.scalar(db.select(func.count(PriceHistory.id)).where(PriceHistory.recorded_at >= start_of_day)),
     }
 
     recent = db.session.execute(
-        db.select(PriceHistory, Product, Store)
+        db.select(PriceHistory, Product, Store, User)
         .join(ProductStore, PriceHistory.product_store_id == ProductStore.id)
         .join(Product, ProductStore.product_id == Product.id)
         .join(Store, ProductStore.store_id == Store.id)
+        .outerjoin(User, PriceHistory.user_id == User.id)
         .order_by(PriceHistory.recorded_at.desc())
         .limit(5)
     ).all()
 
     activity = [
         {
+            "user": user.username if user else "Anonymous",
             "food": product.name,
             "price": format_number(history.price),
             "store": store.name,
             "location": store.location,
             "time": time_ago(history.recorded_at),
         }
-        for history, product, store in recent
+        for history, product, store, user in recent
     ]
 
     q = request.args.get("q", "").strip()
@@ -81,7 +142,7 @@ def dashboard():
 
         stats=stats,
         activity=activity,
-
+        
         q=q,
         groups=groups,
     )         # form=form, # selected_products=selected_products,
@@ -135,14 +196,13 @@ def history():
     return render_template("history.html")
 
 
+
 @app.route("/compare", methods=["GET", "POST"])
 def compare():
     form = CompareForm()
 
-    products = db.session.scalars(
-        db.select(Product).order_by(Product.name)).all()
-    form.products.choices = [(str(product.id), product.name)
-                             for product in products]
+    products = db.session.scalars(db.select(Product).order_by(Product.name)).all()
+    form.products.choices = [(str(product.id), product.name)for product in products]
     chosen_listings_rows = []
 
     if form.validate_on_submit():
@@ -158,9 +218,9 @@ def compare():
         if len(selected_products) != len(set(product_ids)):
             raise ValueError("One or more selected products do not exist.")
 
-        # find the latest price for each listing
+        #find the latest price for each listing
         latest_prices = (db.select(PriceHistory.product_store_id, db.func.max(PriceHistory.id).label("latest_id"))
-                         .group_by(PriceHistory.product_store_id) .subquery())
+            .group_by(PriceHistory.product_store_id) .subquery())
 
         chosen_listings_rows = db.session.execute(
             db.select(ProductStore, Product, Store, PriceHistory)
@@ -234,30 +294,28 @@ def day_summary():
         })
     return render_template("day_summary.html", chosen=chosen, today=today, entries=entries)
 
-
 @app.route('/nukedb')
 def nuke_db():
-
+    
     db.drop_all()
     db.create_all()
-
+    
     return redirect('/')
-
 
 @app.route('/update')
 def deploy():
     pa_token = os.environ.get("PA_API_TOKEN")
-
+    
     result = subprocess.run(
-        ['git', 'pull'],
+        ['git', 'pull'], 
         cwd='/home/CommunityFoodPrice/foodprice',
-        capture_output=True,
+        capture_output=True, 
         text=True
     )
-
+    
     if result.returncode != 0:
         return f"there was an error running `git pull`. Error: {result.stderr}"
-
+        
     reload_url = f"https://www.pythonanywhere.com/api/v0/user/CommunityFoodPrice/webapps/CommunityFoodPrice.pythonanywhere.com/reload/"
     req = urllib.request.Request(reload_url, method='POST')
     req.add_header('Authorization', f'Token {pa_token}')
