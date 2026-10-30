@@ -208,7 +208,7 @@ def contributions():
             recorded = recorded.replace(tzinfo=timezone.utc)
     
         entries.append({
-            "time": recorded.astimezone(manila).strftime("%I:%M %p"),
+            "date": recorded.astimezone(manila).strftime("%b %d, %Y %I:%M %p"),
             "food": product.name,
             "category": product.category,
             "store": store.name,
@@ -216,7 +216,14 @@ def contributions():
             "price": history.price
         })
 
-    return render_template("contributions.html", entries=entries)
+    stats = {
+        "prices": len(entries),
+        "foods": len({e["food"] for e in entries}),
+        "stores": len({(e["store"], e["location"]) for e in entries}),
+        "locations": len({e["location"] for e in entries}),
+    }
+
+    return render_template("contributions.html", entries=entries, stats=stats)
 
 
 @app.route("/history")
