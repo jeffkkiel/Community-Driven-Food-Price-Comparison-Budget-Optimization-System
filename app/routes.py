@@ -173,7 +173,35 @@ def optimize():
 
 @app.route("/contributions")
 def contributions():
-    return render_template("contributions.html")
+    manila = timezone(timedelta(hours=8))
+
+    rows = db.session.execute(
+            db.select(PriceHistory, Product, Store)
+            .join(ProductStore, PriceHistory.product_store_id == ProductStore.id)
+            .join(Product, ProductStore.product_id == Product.id)
+            .join(Store, ProductStore.store_id == Store.id)
+            .where(PriceHistory.user_id == current_user.id)
+            .order_by(PriceHistory.recorded_at.desc())
+        ).all()
+
+    entries = []
+    
+    for history, product, store in rows:
+        recorded = history.recorded_at
+    
+        if recorded.tzinfo is None:
+            recorded = recorded.replace(tzinfo=timezone.utc)
+    
+        entries.append({
+            "time": recorded.astimezone(manila).strftime("%I:%M %p"),
+            "food": product.name,
+            "category": product.category,
+            "store": store.name,
+            "location": store.location,
+            "price": history.price
+        })
+
+    return render_template("contributions.html", entries=entries)
 
 
 @app.route("/history")

@@ -21,7 +21,7 @@
         <i class="fa-brands fa-opencart"></i>
         <div class="brand-text">
           <p class="brand-name">Food Price Optimizer</p>
-          <p class="brand-description">Enjoy</p>
+          <p class="brand-description">Know the price before you go.</p>
         </div>
       </a>
 
@@ -51,10 +51,12 @@
           </button>
         </form>
       </div>
-    {% else %}
+      {% else %}
       <nav class="nav-actions">
         <a href="{{ url_for('login') }}" class="nav-btn">Log in</a>
-        <a href="{{ url_for('register') }}" class="nav-btn nav-btn-solid">Register</a>
+        <a href="{{ url_for('register') }}" class="nav-btn nav-btn-solid"
+          >Register</a
+        >
       </nav>
       {% endif %}
     </header>
@@ -70,36 +72,49 @@
 
     <!-- Footer -->
     <footer class="footer">
-      <div class="container">
-        <h3>About us</h3>
-        <p>...</p>
-
-        <div class="social-links">
-          <a
-            href="https://facebook.com/NBA"
-            target="_blank"
-            rel="noopener"
-            aria-label="Facebook"
-          >
-            <i class="fa-brands fa-facebook-f"></i>
-          </a>
-          <a
-            href="https://github.com/NBA"
-            target="_blank"
-            rel="noopener"
-            aria-label="GitHub"
-          >
-            <i class="fa-brands fa-github"></i>
-          </a>
+      <div class="container footer-grid">
+        <div>
+          <h3>About us</h3>
+          <p>
+            Food Price Optimizer is a community-powered site where shoppers
+            share food prices so everyone can find the cheapest store for their
+            budget.
+          </p>
         </div>
 
-        <p class="credits">
-          Developed by Jeff Ezekiel Belnas | Quintela, Justin Matthew |
-          Trinidad, Ian Kyle
-        </p>
-      </div>
-    </footer>
+        <div>
+          <h3> <i class="fa-solid fa-crown"></i> The Real Big 3</h3>
+          <ul class="big-3">
+            <li>
+              <a
+                href="https://github.com/jeffkkiel"
+                target="_blank"
+                rel="noopener"
+              >
+                <i class="fa-brands fa-github"></i> Jeff Belnas
+              </a>
+            </li>
 
+            <li>
+              <a
+                href="https://github.com/Conflow24"
+                target="_blank"
+                rel="noopener"
+              >
+                <i class="fa-brands fa-github"></i> Justin Quintela
+              </a>
+            </li>
+
+            <li>
+              <a href="https://github.com/niqn" target="_blank" rel="noopener">
+                <i class="fa-brands fa-github"></i> Ian Trinidad
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <p class="credits">© 2026 Food Price Optimizer</p>
+    </footer>
     <script src="{{ url_for('static', filename='js/js.js') }}"></script>
   </body>
 </html>
