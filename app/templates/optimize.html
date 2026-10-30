@@ -65,80 +65,79 @@ block head %}
   {% endif %}
 
   {% if products %}
-  {% set ns = namespace(products=0, units=0) %}
-  {% for row in products %}
-    {% set current_quantity = quantities.get(row.product.id, 0)|int %}
-    {% if current_quantity > 0 %}
-      {% set ns.products = ns.products + 1 %}
-      {% set ns.units = ns.units + current_quantity %}
-    {% endif %}
-  {% endfor %}
+  {% set icons = {"Bakery": "bread-slice", "Beverages": "mug-hot", "Canned Goods": "box", "Chilled": "snowflake", "Condiments": "pepper-hot", "Frozen": "icicles", "Fruits": "apple-whole", "Household": "house", "Meat": "drumstick-bite", "Rice & Grains": "wheat-awn", "Seafood": "fish", "Snacks": "cookie-bite", "Sweets": "candy-cane", "Vegetables": "carrot"} %}
+  
   <form method="POST" action="{{ url_for('optimize') }}">
     {{ form.hidden_tag() }}
     <input type="hidden" name="step" value="calculate" />
     <input type="hidden" name="location" value="{{ location }}" />
     <input type="hidden" name="budget" value="{{ '%.2f'|format(budget) }}" />
 
-    <div class="choose-category basket-chips">
-      <button type="button" class="chip active" data-category="" aria-pressed="true">All</button>
+    <div class="basket-layout">
+      <div class="basket-main">
+        <div class="basket-search"> 
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="search" id="basket-search" placeholder="Search products..." aria-label="Search products" />
+        </div>
+        
+        <div class="choose-category basket-chips">
+          <button type="button" class="chip active" data-category="" aria-pressed="true"> <i class="fa-solid fa-layer-group"></i>All
+        </button>
+      
       {% for category in categories %}
-      <button type="button" class="chip" data-category="{{ category }}" aria-pressed="false">{{ category }}</button>
+      <button type="button" class="chip" data-category="{{ category }}" aria-pressed="false"> <i class="fa-solid fa-{{ icons.get(category, 'tag') }}"></i>{{ category }}
+    </button>
       {% endfor %}
     </div>
 
-    <div class="product-grid" id="basket-grid">
-      {% for row in products %}
-      {% set quantity = quantities.get(row.product.id, 0)|int %}
-      <div
-        class="product-card basket-card{{ ' selected' if quantity > 0 }}"
-        data-category="{{ row.product.category }}"
-      >
-        <span class="product-cat">{{ row.product.category }}</span>
-        <h3>{{ row.product.name }}</h3>
-        {% if row.product.description %}
-        <p class="product-desc">{{ row.product.description }}</p>
-        {% endif %}
-        <div class="product-foot">
-          <strong class="product-price">₱{{ "%.2f"|format(row.price) }}</strong>
-          <span class="product-stores">{{ row.store.name }}</span>
+    <div class="product-list" id="basket-grid" data-budget="{{ '%.2f'|format(budget) }}">
+          {% for row in products %}
+          {% set quantity = quantities.get(row.product.id, 0)|int %}
+          <div
+            class="basket-row{{ ' selected' if quantity > 0 }}"
+            data-category="{{ row.product.category }}"
+            data-name="{{ row.product.name }}"
+            data-price="{{ '%.2f'|format(row.price) }}"
+          >
+            <i class="fa-solid fa-{{ icons.get(row.product.category, 'tag') }} row-icon"></i>
+            <div class="row-info"{% if row.product.description %} title="{{ row.product.description }}"{% endif %}>
+              <strong class="row-name">{{ row.product.name }}</strong>
+              <span class="row-store">{{ row.store.name }} · {{ row.product.category }}</span>
+            </div>
+            <strong class="row-price">₱{{ "%.2f"|format(row.price) }}</strong>
+            <div class="qty-stepper">
+              <button type="button" class="qty-btn" data-step="-1" aria-label="Decrease quantity for {{ row.product.name }}">−</button>
+              <input
+                type="text"
+                class="qty-input"
+                name="qty_{{ row.product.id }}"
+                value="{{ quantity }}"
+                inputmode="none"
+                readonly
+                aria-label="Quantity for {{ row.product.name }}"
+              />
+              <button type="button" class="qty-btn" data-step="1" aria-label="Increase quantity for {{ row.product.name }}">+</button>
+            </div>
+          </div>
+          {% endfor %}
         </div>
-        <div class="qty-stepper">
-          <button
-            type="button"
-            class="qty-btn"
-            data-step="-1"
-            aria-label="Decrease quantity for {{ row.product.name }}"
-          >−</button>
-          <input
-            type="text"
-            class="qty-input"
-            name="qty_{{ row.product.id }}"
-            value="{{ quantity }}"
-            inputmode="none"
-            readonly
-            aria-label="Quantity for {{ row.product.name }}"
-          />
-          <button
-            type="button"
-            class="qty-btn"
-            data-step="1"
-            aria-label="Increase quantity for {{ row.product.name }}"
-          >+</button>
-        </div>
+        <p class="empty" id="no-match" hidden>No products match your search.</p>
       </div>
-      {% endfor %}
-    </div>
 
-    <div class="basket-actions">
-      <p id="basket-count" aria-live="polite">
-        {% if ns.products %}
-          {{ ns.products }} item{{ "" if ns.products == 1 else "s" }}
-          · {{ ns.units }} unit{{ "" if ns.units == 1 else "s" }} selected
-        {% else %}
-          No items selected
-        {% endif %}
-      </p>
-      <button type="submit" class="btn">Calculate plan</button>
+      <aside class="basket-panel">
+        <h2>Your basket</h2>
+        <p class="panel-count" id="basket-count" aria-live="polite">No items selected</p>
+        <ul class="panel-items" id="panel-items"></ul>
+
+        <div class="panel-total">
+          <span>Estimated total</span>
+          <strong id="panel-total">₱0.00</strong>
+        </div>
+        <div class="budget-bar"><div class="budget-fill" id="budget-fill"></div></div>
+        <p class="budget-text" id="budget-text"></p>
+
+        <button type="submit" class="btn" id="calculate-btn">Calculate plan</button>
+      </aside>
     </div>
   </form>
 
