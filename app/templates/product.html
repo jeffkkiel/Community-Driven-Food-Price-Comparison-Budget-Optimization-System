@@ -16,10 +16,9 @@ head %}
     </a>
   </div>
   <h1>{{ product.name }}</h1>
-  <h3>{{ product.category }}</h3>
-  <p>Description<br>{{ product.description }}</p>
+  <span class="product-cat">{{ product.category }}</span>
 
-  <h3>Stores: </h3>
+  <h2 class="section-title">Stores</h2>
   {% for store_id, store in stores.items() %}
     <div class="store-card">
 
