@@ -82,21 +82,6 @@ def logout():
 
 @app.route("/", methods=["GET", "POST"])
 def dashboard():
-    # form = CompareForm()
-    # products = db.session.scalars(
-    #     db.select(Product).order_by(Product.name)).all()
-    # form.product.choices = [(str(prod.id), prod.name) for prod in products]
-    # selected_ids = session.get('compare_products', [])
-
-    # if form.validate_on_submit():
-    #     product_id = form.product.data
-    #     if product_id not in selected_ids:
-    #         selected_ids.append(product_id)
-    #     session['compare_products'] = selected_ids
-    #     return redirect(url_for('dashboard'))
-
-    # selected_products = db.session.scalars(db.select(Product).where(
-    #     Product.id.in_(selected_ids))).all() if selected_ids else []
 
     manila = timezone(timedelta(hours=8))
     start_of_day = (
@@ -197,55 +182,117 @@ def history():
 
 
 
-@app.route("/compare", methods=["GET", "POST"])
-def compare():
-    form = CompareForm()
+# @app.route("/compare", methods=["GET", "POST"])
+# def compare():
+#     form = CompareForm()
 
-    products = db.session.scalars(db.select(Product).order_by(Product.name)).all()
-    form.products.choices = [(str(product.id), product.name)for product in products]
-    chosen_listings_rows = []
+#     products = db.session.scalars(db.select(Product).order_by(Product.name)).all()
+#     form.products.choices = [(str(product.id), product.name)for product in products]
+#     chosen_listings_rows = []
 
-    if form.validate_on_submit():
-        try:
-            product_ids = [int(pid) for pid in form.products.data]
-        except (ValueError, TypeError):
-            raise ValueError("Please select valid products.")
-        # check if product israel
-        selected_products = db.session.scalars(
-            db.select(Product).where(Product.id.in_(product_ids))
-        ).all()
+#     if form.validate_on_submit():
+#         try:
+#             product_ids = [int(pid) for pid in form.products.data]
+#         except (ValueError, TypeError):
+#             raise ValueError("Please select valid products.")
+#         # check if product israel
+#         selected_products = db.session.scalars(
+#             db.select(Product).where(Product.id.in_(product_ids))
+#         ).all()
 
-        if len(selected_products) != len(set(product_ids)):
-            raise ValueError("One or more selected products do not exist.")
+#         if len(selected_products) != len(set(product_ids)):
+#             raise ValueError("One or more selected products do not exist.")
 
-        #find the latest price for each listing
-        latest_prices = (db.select(PriceHistory.product_store_id, db.func.max(PriceHistory.id).label("latest_id"))
-            .group_by(PriceHistory.product_store_id) .subquery())
+#         #find the latest price for each listing
+#         latest_prices = (db.select(PriceHistory.product_store_id, db.func.max(PriceHistory.id).label("latest_id"))
+#             .group_by(PriceHistory.product_store_id).subquery())
 
-        chosen_listings_rows = db.session.execute(
-            db.select(ProductStore, Product, Store, PriceHistory)
-            .join(Product, ProductStore.product_id == Product.id)
-            .join(Store, ProductStore.store_id == Store.id)
-            .outerjoin(latest_prices, latest_prices.c.product_store_id == ProductStore.id)
-            .outerjoin(PriceHistory, PriceHistory.id == latest_prices.c.latest_id)
-            .where(Product.id.in_(product_ids))
-            .order_by(Product.name, Store.name)
-        ).all()
+#         chosen_listings_rows = db.session.execute(
+#             db.select(ProductStore, Product, Store, PriceHistory)
+#             .join(Product, ProductStore.product_id == Product.id)
+#             .join(Store, ProductStore.store_id == Store.id)
+#             .outerjoin(latest_prices, latest_prices.c.product_store_id == ProductStore.id)
+#             .outerjoin(PriceHistory, PriceHistory.id == latest_prices.c.latest_id)
+#             .where(Product.id.in_(product_ids))
+#             .order_by(Product.name, Store.name)
+#         ).all()
 
-    chosen_listings = []
-    for listing, product, stor_loc, price in chosen_listings_rows:
-        chosen_listings.append({
-            'listing': listing,
-            'product': product,
-            'store': stor_loc,
-            'price': price
-        })
-    return render_template(
-        "compare.html",
-        form=form,
-        listing=chosen_listings
+#     chosen_listings = []
+#     for listing, product, stor_loc, price in chosen_listings_rows:
+#         chosen_listings.append({
+#             'listing': listing,
+#             'product': product,
+#             'store': stor_loc,
+#             'price': price
+#         })
+#     return render_template("compare.html", form=form, listing=chosen_listings)
+
+
+#dagdagan ng image pag di tinamad, may default image based on category(?)
+@app.route("/browse")
+def browse():
+    latest_prices = (db.select(PriceHistory.product_store_id, db.func.max(PriceHistory.id).label("latest_id"))
+        .group_by(PriceHistory.product_store_id).subquery())
+    store_counts = (
+        db.select(ProductStore.product_id, db.func.count(db.distinct(ProductStore.store_id)).label("store_count"))
+        .group_by(ProductStore.product_id).subquery())
+    product_prices = (
+        db.select(ProductStore.product_id, PriceHistory.price, PriceHistory.recorded_at,
+            db.func.row_number().over(partition_by=ProductStore.product_id, order_by=PriceHistory.recorded_at.desc()).label("rank"))
+        .join(PriceHistory, PriceHistory.product_store_id == ProductStore.id)
+        .join(latest_prices, latest_prices.c.latest_id == PriceHistory.id)
+        .subquery()
     )
+    rows = db.session.execute(
+        db.select(Product, product_prices.c.price, store_counts.c.store_count)
+        .join(product_prices, product_prices.c.product_id == Product.id)
+        .join(store_counts, store_counts.c.product_id == Product.id)
+        .where(product_prices.c.rank == 1)
+        .order_by(Product.name)
+    ).all()
 
+    products = []
+
+    for product, price, store_count in rows:
+        products.append({
+            "id": product.id,
+            "name": product.name,
+            "category": product.category,
+            "description": product.description,
+            "price": price,
+            "stores": store_count
+        })
+    
+    return render_template("browse.html", products=products)
+
+@app.route("/product/<int:product_id>")
+def product(product_id):
+    product = db.session.get(Product, product_id)
+    if product is None:
+        return "Product not found", 404
+    rows = db.session.execute(db.select(Product, ProductStore, Store, PriceHistory)
+        .join(ProductStore, ProductStore.product_id == Product.id)
+        .join(Store, Store.id == ProductStore.store_id)
+        .outerjoin(PriceHistory, PriceHistory.product_store_id == ProductStore.id)
+        .where(Product.id == product_id).order_by(Store.name, PriceHistory.recorded_at.desc())
+    ).all()
+
+    stores = {}
+    for product, listing, store, history in rows:
+        if store.id not in stores:
+            stores[store.id] = {
+                "name": store.name,
+                "location": store.location,
+                "prices": []
+            }
+
+        if history:
+            stores[store.id]["prices"].append({
+                "price": history.price,
+                "recorded_at": history.recorded_at
+            })
+
+    return render_template("product.html", product=product, stores=stores)
 
 @app.route("/day-summary")
 def day_summary():

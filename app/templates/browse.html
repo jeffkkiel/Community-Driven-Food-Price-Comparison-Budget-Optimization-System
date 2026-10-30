@@ -1,0 +1,51 @@
+{% extends "base.html" %} {% block title %}Browse Products{% endblock %} {% block
+head %}
+
+<!-- make own css -->
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/dashboard.css') }}"
+/>
+{% endblock %} {% block content %}
+<main class="page">
+  <a href="{{ url_for('dashboard') }}" class="back-link">
+    <i class="fa-solid fa-arrow-left"></i> Back to dashboard
+  </a>
+
+  <h1>Browse Products</h1>
+  <p>
+    Browse the products
+  </p>
+  <!-- dagdagan ng image pag di tinamad. dalawang version isang wala isang meron -->
+  {% if products %}
+    {% for prod in products %}
+    <a href="{{ url_for('product', product_id=prod.id) }}">
+      <div class="card">
+        <div class="desc">
+          <h3>{{ prod.name }}</h3>
+          <p>{{ prod.category }}</p>
+          <p>{{ prod.description }}</p>
+        </div>
+        <p>Latest Price: ₱{{ prod.price }}</p>
+        <p>Available in {{ prod.stores }} Stores</p>
+      </div>
+    </a>
+    {% endfor %}
+  {% else %}
+  <p class="empty">No products currently logged.</p>
+  {% endif %}
+
+  <aside class="side-column">
+    <div class="panel panel-dark">
+      <section class="big-cards">
+        <a href="{{ url_for('add_product') }}" class="card card-big">
+          <i class="fa-solid fa-plus"></i>
+          <h2>Add Price</h2>
+          <p>Saw a price at your store? Share it with the community.</p>
+        </a>
+      </section>
+    </div>
+  </aside>
+</main>
+
+{% endblock %}
