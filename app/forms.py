@@ -5,7 +5,8 @@ from wtforms.widgets import ListWidget, CheckboxInput
 from wtforms.validators import DataRequired, Optional, NumberRange, Length, ValidationError, EqualTo
 
 CATEGORIES = [
-    "Fruits", "Vegetables", "Meat", "Seafood", "Chilled", "Frozen", "Snacks", "Sweets", "Beverages"
+    "Fruits", "Vegetables", "Meat", "Seafood", "Chilled", "Frozen", "Snacks", "Sweets", "Beverages",
+    "Rice & Grains", "Canned Goods", "Condiments", "Household", "Bakery",
 ]
 
 LOCATIONS = [
@@ -43,3 +44,15 @@ class ProductForm(FlaskForm):
 #     products = SelectMultipleField('Add a food to compare',choices=[], option_widget=CheckboxInput(),
 #                                    widget=ListWidget(prefix_label=False))
 #     submit = SubmitField('Add')
+
+
+class OptimizeForm(FlaskForm):
+    location = SelectField('Location', choices=[], validators=[DataRequired()])
+    budget = DecimalField('Budget (₱)', places=2, validators=[DataRequired()])
+    submit = SubmitField('Continue')
+
+    def validate_budget(self, field):
+        if field.data is not None and (
+            not field.data.is_finite() or field.data < 0
+        ):
+            raise ValidationError("Enter a valid budget.")

@@ -16,7 +16,7 @@
   </a>
 </div>
   <h1>Add a price</h1>
-  <p>Share a price you saw so others can compare.</p>
+  <p>Share a price you  saw so others can compare.</p>
 
   <form
     action="{{ url_for('add_product') }}"
@@ -109,6 +109,7 @@
 
     {{ form.submit(class="btn btn-primary") }}
   </form>
+  {% include "quick_links.html" %}
 </main>
 <script
   src="{{ url_for('static', filename='js/add_product.js') }}"
