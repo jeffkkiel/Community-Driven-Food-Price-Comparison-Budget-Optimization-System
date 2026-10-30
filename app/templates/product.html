@@ -15,9 +15,14 @@ head %}
       <i class="fa-solid fa-plus"></i> Add price
     </a>
   </div>
-  <h1>{{ product.name }}</h1>
-  <span class="product-cat">{{ product.category }}</span>
-
+  <div class="product-upper">
+    <img src="{{ url_for('static', filename=product.img_ref) }}" alt="{{ product.category }} Default Image" class="product-image">
+    <div class="product-info">
+      <h1>{{ product.name }}</h1>
+      <span class="product-cat">{{ product.category }}</span>
+    </div>
+  
+  </div>
   <h2 class="section-title">Stores</h2>
   {% for store_id, store in stores.items() %}
     <div class="store-card">
