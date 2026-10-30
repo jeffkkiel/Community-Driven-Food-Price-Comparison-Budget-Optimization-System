@@ -1,0 +1,22 @@
+{% set links = [
+  ('add_product', 'fa-plus', 'Add Price', 'Share a price you saw.'),
+  ('optimize', 'fa-arrow-trend-up', 'Optimize Budget', 'Find the cheapest store.'),
+  ('browse', 'fa-boxes-stacked', 'Browse Products', 'See all products and prices.'),
+  ('day_summary', 'fa-calendar-day', 'Day Summary', 'Prices reported on a date.'),
+  ('contributions', 'fa-user', 'My Contributions', 'Prices you submitted.'),
+] %}
+
+{% set others = links | rejectattr('0', 'equalto', request.endpoint) | list %}
+
+<section class="quick-links">
+  <h2>Looking for something else?</h2>
+  <div class="quick-grid">
+    {% for endpoint, icon, title, text in others[:3] %} 
+    <a href="{{ url_for(endpoint) }}" class="quick-card">
+      <i class="fa-solid {{ icon }}"></i>
+      <h3>{{ title }}</h3>
+      <p>{{ text }}</p>
+    </a>
+    {% endfor %}
+  </div>
+</section>

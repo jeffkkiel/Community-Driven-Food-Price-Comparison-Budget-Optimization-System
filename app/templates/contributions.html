@@ -84,7 +84,8 @@ block content %}
   {% else %}
   <p class="empty">You haven't added any prices yet.</p>
   <p class="empty"><a href="{{ url_for('add_product') }}">Add your first price</a></p>
-  {% endif %}  
+  {% endif %} 
+  {% include "quick_links.html" %} 
 </main>
 
 {% endblock %}
