@@ -236,6 +236,33 @@ a { color: inherit; text-decoration: none; }
 .btn:hover { background: var(--green-dark); }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
 
+/* top row: back on the left, action on the right */
+.page-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.top-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 2px solid var(--green);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--green-dark);
+    font-weight: 700;
+    font-size: 14px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.top-btn:hover { background: var(--green); color: #fff; }
+.top-btn-solid { background: var(--green); color: #fff; }
+.top-btn-solid:hover { background: var(--green-dark); border-color: var(--green-dark); }
+
 /* footer */
 .footer {
     margin-top: 24px;

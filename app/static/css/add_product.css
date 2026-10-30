@@ -25,6 +25,9 @@
     cursor: pointer;
 }
 
+.page form .btn-primary { margin-top: 4px; }
+.page textarea { min-height: 90px; resize: vertical; }
+
 #new-store-group,
 #new-product-group {
     padding-left: 14px;

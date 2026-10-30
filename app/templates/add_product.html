@@ -7,9 +7,14 @@
 
 <main class="page">
   <!-- Back link -->
-  <a href="{{ url_for('browse') }}" class="back-link">
-    <i class="fa-solid fa-arrow-left"></i> Browse Products
+  <div class="page-top">
+  <a href="{{ url_for('dashboard') }}" class="back-link">
+    <i class="fa-solid fa-arrow-left"></i> Back to dashboard
   </a>
+  <a href="{{ url_for('browse') }}" class="top-btn">
+    Browse products <i class="fa-solid fa-arrow-right"></i>
+  </a>
+</div>
   <h1>Add a price</h1>
   <p>Share a price you saw so others can compare.</p>
 

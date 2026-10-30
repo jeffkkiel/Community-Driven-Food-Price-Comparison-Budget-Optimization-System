@@ -2,15 +2,19 @@
 head %}
 <link
   rel="stylesheet"
-  href="{{ url_for('static', filename='css/history.css') }}"
+  href="{{ url_for('static', filename='css/browse.css') }}"
 />
 {% endblock %} {% block content %}
- <!-- Back link -->
-  <a href="{{ url_for('browse') }}" class="back-link">
-    <i class="fa-solid fa-arrow-left"></i> Browse Products
-  </a>
-
-<main class="page">
+ 
+<main class="page page-wide">
+  <div class="page-top">
+    <a href="{{ url_for('browse') }}" class="back-link">
+      <i class="fa-solid fa-arrow-left"></i> Browse products
+    </a>
+    <a href="{{ url_for('add_product') }}" class="top-btn top-btn-solid">
+      <i class="fa-solid fa-plus"></i> Add price
+    </a>
+  </div>
   <h1>{{ product.name }}</h1>
   <h3>{{ product.category }}</h3>
   <p>Description<br>{{ product.description }}</p>
@@ -34,5 +38,4 @@ head %}
     </div>
     {% endfor %}
 </main>
-
 {% endblock %}
