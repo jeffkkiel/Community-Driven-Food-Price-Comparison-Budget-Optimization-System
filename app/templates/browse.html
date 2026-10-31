@@ -47,7 +47,9 @@ block head %}
               <p class="product-desc">{{ prod.description }}</p>
               {% endif %}
             </div>
-            <img src="{{ url_for('static', filename=prod.img) }}" alt="{{ prod.category }} Default Image" class="browse-image">
+            {% if prod.img %}
+            <img src="{{ url_for('static', filename=prod.img) }}" alt="{{ prod.category }}" class="browse-image">
+            {% endif %}
           </div>
           <div class="product-foot">
             <strong class="product-price">₱{{ "%.2f"|format(prod.price) }}</strong>
