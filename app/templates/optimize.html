@@ -145,13 +145,13 @@ block head %}
   <section class="results" id="results">
     <div class="plan-summary">
       <div>
-        <span class="summary-label">Best mix total</span>
+        <span class="summary-label">Plan total</span>
         <strong class="summary-total">₱{{ "%.2f"|format(plan.total) }}</strong>
         {% set total_units = plan.lines|sum(attribute="quantity") %}
         {% set store_count = plan.lines|map(attribute="store.name")|unique|list|length %}
         <span class="summary-sub">
-          {{ total_units }} item{{ "" if total_units == 1 else "s" }}
-          from {{ store_count }} store{{ "" if store_count == 1 else "s" }}
+          {{ total_units }} item{{ "" if total_units == 1 else "s" }} · lowest price
+          per item from {{ store_count }} store{{ "" if store_count == 1 else "s" }}
         </span>
       </div>
 
@@ -186,20 +186,20 @@ block head %}
     {% if plan.cheapest_store %}
       {% if plan.savings > 0 %}
       <p class="plan-note">
-        The best mix saves <strong>₱{{ "%.2f"|format(plan.savings) }}</strong>
-        compared with {{ plan.cheapest_store.store.name }}, the cheapest store
-        that has every item.
+        This plan saves <strong>₱{{ "%.2f"|format(plan.savings) }}</strong>
+        compared with {{ plan.cheapest_store.store.name }}, the cheapest single
+        store that has every item.
       </p>
       {% else %}
       <p class="plan-note">
-        {{ plan.cheapest_store.store.name }} is the cheapest store that has
-        every item and matches the best mix.
+        {{ plan.cheapest_store.store.name }} is the cheapest single store that
+        has every item, and it matches this plan.
       </p>
       {% endif %}
     {% else %}
     <p class="plan-note">
-      No single store has every selected item, so the best mix is the only
-      complete option.
+      No single store has every selected item, so shopping at more than one
+      store is required.
     </p>
     {% endif %}
 
@@ -210,7 +210,28 @@ block head %}
     </p>
     {% endif %}
 
-    <h2>Store breakdown</h2>
+    {% if plan.lines %}
+    <h2>Best price for each item</h2>
+
+    <div class="item-list">
+      {% for line in plan.lines %}
+      <div class="item-row">
+        <i class="fa-solid fa-{{ icons.get(line.product.category, 'tag') }} row-icon"></i>
+        <div class="row-info">
+          <strong class="row-name">{{ line.product.name }}</strong>
+          <span class="row-store">
+            {{ line.store.name }} · ₱{{ "%.2f"|format(line.unit_price) }} each
+          </span>
+        </div>
+        <span class="item-qty">× {{ line.quantity }}</span>
+        <strong class="row-price">₱{{ "%.2f"|format(line.subtotal) }}</strong>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <h2>If you bought everything at one store</h2>
+    <p class="section-sub">What each store would charge for your whole basket.</p>
 
     <div class="store-list">
       {% for row in plan.store_totals %}
