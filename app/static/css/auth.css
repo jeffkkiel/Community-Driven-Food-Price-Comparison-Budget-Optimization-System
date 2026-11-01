@@ -123,22 +123,27 @@
 
 /* mobile: stack, no sliding */
 @media (max-width: 700px) {
-    .auth-card { flex-direction: column; }
-
-    .auth-panel,
-    .auth-card.register .auth-panel {
-        position: static;
-        width: 100%;
-        height: auto;
-        padding: 24px;
-        transform: none;
-        border-radius: 0 0 40px 40px;
-    }
+    .auth-card { flex-direction: column; min-height: 0; }
 
     .auth-form-side,
     .auth-card.register .auth-form-side {
+        order: 1;
         width: 100%;
         margin-left: 0;
         padding: 28px 20px;
     }
+
+    .auth-panel,
+    .auth-card.register .auth-panel {
+        order: 2;
+        position: static;
+        width: 100%;
+        height: auto;
+        padding: 20px;
+        transform: none;
+        border-radius: 40px 40px 0 0;
+    }
+
+    .auth-logo { display: none; }
+    .auth-panel h2 { font-size: 22px; }
 }

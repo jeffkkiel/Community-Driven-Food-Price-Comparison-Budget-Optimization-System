@@ -276,16 +276,12 @@
 
 .basket-panel .btn { width: 100%; }
 
-@media (max-width: 800px) {
-    .basket-layout { grid-template-columns: 1fr; }
-    .basket-panel {
-        position: sticky;
-        top: auto;
-        bottom: 0;
-        border-radius: var(--radius) var(--radius) 0 0;
-    }
-
-    .panel-items { display: none; }
+@media (max-width: 600px) {
+    .basket-row { flex-wrap: wrap; row-gap: 8px; }
+    .row-info { flex: 1 1 calc(100% - 32px); }
+    .row-name { white-space: normal; }
+    .row-price { margin-left: 32px; margin-right: auto; }
+    .basket-row .qty-btn { width: 38px; height: 38px; }
 }
 
 /* results */
@@ -472,6 +468,26 @@
     font-weight: 700;
 }
 
+@media (max-width: 800px) {
+    .basket-layout { grid-template-columns: 1fr; }
+
+    .basket-chips { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; }
+    .basket-chips .chip { flex: none; }
+
+    .basket-panel {
+        position: sticky;
+        top: auto;
+        bottom: 0;
+        z-index: 5;
+        padding: 12px 16px;
+        border-radius: var(--radius) var(--radius) 0 0;
+        box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .basket-panel h2,
+    .panel-items { display: none; }
+}
+
 @media (max-width: 600px) {
     .plan-summary { flex-direction: column; align-items: stretch; }
 
@@ -486,3 +502,15 @@
 
     .store-line { flex-wrap: wrap; }
 }
+  .setup-card {
+      margin-top: 16px;
+      padding: 28px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+  }
+  .setup-card .btn { width: 100%; padding: 14px 24px; }
+  @media (max-width: 600px) { .setup-card { padding: 20px 16px; } }
+
+
+    .opt-meta { display: flex; flex-wrap: wrap; gap: 4px 16px; }

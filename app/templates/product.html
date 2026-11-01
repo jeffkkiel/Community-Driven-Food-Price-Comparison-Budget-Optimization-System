@@ -15,12 +15,18 @@ head %}
       <i class="fa-solid fa-plus"></i> Add price
     </a>
   </div>
-  <div class="product-upper">
-    <img src="{{ url_for('static', filename=product.img_ref) }}" alt="{{ product.category }} Default Image" class="product-image">
+      <div class="product-upper">
+    {% if product.img_ref %}
+    <img src="{{ url_for('static', filename=product.img_ref) }}" alt="{{ product.name }}" class="product-image">
+    {% else %}
+    <div class="product-image product-image-empty"><i class="fa-solid fa-image"></i></div>
+    {% endif %}
+
     <div class="product-info">
       <h1>{{ product.name }}</h1>
       <span class="product-cat">{{ product.category }}</span>
     </div>
+  </div>
   
   </div>
   <h2 class="section-title">Stores</h2>
